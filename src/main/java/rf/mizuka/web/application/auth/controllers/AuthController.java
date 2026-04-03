@@ -1,4 +1,4 @@
-package rf.mizuka.web.controller.auth;
+package rf.mizuka.web.application.auth.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

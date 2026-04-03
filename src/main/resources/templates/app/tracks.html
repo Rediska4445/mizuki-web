@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Mizuka Web - Tracks</title>
 </head>
 <body>
+  <ul>
+    <li th:each="track : ${tracks}" th:text="${track.name}"></li>
+  </ul>
 
+  <form th:action="@{/app/tracks}" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept="audio/*" required/>
+      <button type="submit">Загрузить</button>
+  </form>
 </body>
 </html>
