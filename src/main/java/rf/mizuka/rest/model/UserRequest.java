@@ -1,4 +1,4 @@
-package rf.mizuka;
+package rf.mizuka.rest.model;
 
 public	class UserRequest {
     public String name;

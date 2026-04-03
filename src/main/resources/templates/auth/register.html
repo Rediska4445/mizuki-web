@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mizuka - Регистрация</title>
+</head>
+<body>
+<h1>Регистрация</h1>
+
+<!-- Ошибка регистрации -->
+<div th:if="${registerError}" th:text="${registerError}" style="color:red;"></div>
+
+<!-- Форма регистрации -->
+<form th:action="@{/auth/register}" th:object="${registerForm}" method="post">
+  <div>
+    <label>Логин:</label>
+    <input type="text" th:field="*{username}" required />
+  </div>
+  <div>
+    <label>Email:</label>
+    <input type="email" th:field="*{email}" required />
+  </div>
+  <div>
+    <label>Пароль:</label>
+    <input type="password" th:field="*{password}" required />
+  </div>
+  <div>
+    <label>Повторите пароль:</label>
+    <input type="password" th:field="*{confirmPassword}" required />
+  </div>
+  <button type="submit">Зарегистрироваться</button>
+</form>
+
+<hr />
+<a th:href="@{/auth/login}">Войти</a>
+</body>
+</html>

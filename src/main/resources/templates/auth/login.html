@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mizuka - Вход</title>
+</head>
+<body>
+<h1>Вход</h1>
+
+<!-- Ошибка входа -->
+<div th:if="${loginError}" th:text="${loginError}" style="color:red;"></div>
+
+<!-- Форма входа -->
+<form th:action="@{/auth/login}" th:object="${loginForm}" method="post">
+  <div>
+    <label>Логин:</label>
+    <input type="text" th:field="*{username}" required />
+  </div>
+  <div>
+    <label>Пароль:</label>
+    <input type="password" th:field="*{password}" required />
+  </div>
+  <button type="submit">Войти</button>
+</form>
+
+<hr />
+<a th:href="@{/auth/register}">Зарегистрироваться</a>
+</body>
+</html>
