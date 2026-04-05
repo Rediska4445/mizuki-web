@@ -5,6 +5,8 @@
     <title>Mizuka Web - Tracks</title>
 </head>
 <body>
+  <div>Привет, <span th:text="${username}"></span>!</div>
+
   <ul>
     <li th:each="track : ${tracks}" th:text="${track.name}"></li>
   </ul>
