@@ -227,7 +227,7 @@ public class User
     /**
      * {@link UserDetails#getPassword()} — возвращает BCrypt хэш для проверки пароля.
      *
-     * <p>Используется {@link org.springframework.security.crypto.password.PasswordEncoder#matches()}:
+     * <p>Используется {@link org.springframework.security.crypto.password.PasswordEncoder#matches(CharSequence, String)}}:
      * <pre>
      * DaoAuthenticationProvider:
      * if (!passwordEncoder.matches(rawPassword, userDetails.getPassword())) → провал

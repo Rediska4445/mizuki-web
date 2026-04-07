@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import rf.mizuka.web.application.auth.service.UserService;
 import rf.mizuka.web.application.auth.dto.LoginForm;
@@ -195,7 +194,7 @@ public class AuthController {
      * POST /auth/login — ручная аутентификация пользователя через AuthenticationManager.
      *
      * <p>{@link org.springframework.web.bind.annotation.PostMapping @PostMapping} обрабатывает форму логина
-     * (form submit). **Заменяет отключенный** {@link org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer#loginProcessingUrl() formLogin().disable()}.
+     * (form submit). Заменяет отключенный {@link org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer#loginProcessingUrl(String)} formLogin().disable()}.
      *
      * <p>{@link org.springframework.web.bind.annotation.ModelAttribute @ModelAttribute("loginForm") LoginForm loginForm}:
      * <ul>
@@ -242,10 +241,10 @@ public class AuthController {
      * @return "redirect:/" при успехе или "auth/login" при ошибке
      */
     @PostMapping("/login")
-    public String login(@ModelAttribute("loginForm") LoginForm loginForm, Model model) {
-        String username = loginForm.getUsername();
-        String password = loginForm.getPassword();
-
+    public String login(
+            @ModelAttribute("loginForm") LoginForm loginForm,
+            Model model
+    ) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword())

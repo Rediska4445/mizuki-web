@@ -1,6 +1,7 @@
 package rf.mizuka.web.application.tracks.models;
 
 import jakarta.persistence.*;
+import rf.mizuka.web.application.auth.models.User;
 
 /**
  * ORM‑сущность JPA, представляющая аудиотрек (аудиофайл) в реляционной базе данных.
@@ -227,6 +228,45 @@ public class Track {
      */
     public Track setName(String name) {
         this.name = name;
+        return this;
+    }
+    /**
+     * Возвращает уникальный идентификатор трека.
+     *
+     * <p>На уровне JPA поле {@code id} отображается на первичный ключ таблицы {@code tracks}
+     * с аннотациями {@link jakarta.persistence.Id @Id} и
+     * {@link jakarta.persistence.GeneratedValue @GeneratedValue(strategy = GenerationType.IDENTITY)}.
+     * Это означает, что значение идентификатора генерируется базой данных автоматически
+     * (через автоинкремент), а JPA‑провайдер после {@code INSERT} обновляет поле в объекте.
+     * До сохранения в БД значение может быть {@code null}, что семантически отражает
+     * состояние «новый объект, ещё не persisted».</p>
+     *
+     * <p>Идентификатор используется в:
+     * <ul>
+     *   <li>методах Spring Data JPA‑репозиториев ({@code findById(Long id)},
+     *   {@code deleteById(Long id)}, {@code existsById(Long id)}) для точной идентификации
+     *   конкретного трека;</li>
+     *   <li>REST‑API (JSON‑ответы, пути URL типа {@code /tracks/{id}});</li>
+     *   <li>связях с другими сущностями (внешние ключи в таблицах playlist_tracks,
+     *   user_favorites и т.п.), где {@code track_id} ссылается на этот {@code id}.</li>
+     * </ul>
+     * </p>
+     *
+     * <p>Использование типа {@code Long} (обёртка) вместо {@code long} позволяет корректно
+     * представлять {@code null} для несохранённых объектов в JSON и бизнес‑логике,
+     * избегая ложных значений типа {@code 0L}, которые могли бы интерпретироваться
+     * как валидный идентификатор.</p>
+     *
+     * @return уникальный идентификатор трека; {@code null} для объектов, созданных вручную
+     *         и ещё не сохранённых в базе данных, реальное значение {@code Long} — для
+     *         уже persisted сущностей, загруженных из БД или после успешного {@code save}.
+     */
+    public Long getId() {
+        return id;
+    }
+
+    public Track setId(Long id) {
+        this.id = id;
         return this;
     }
 }

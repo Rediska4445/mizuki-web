@@ -158,7 +158,8 @@ public class TracksController {
     @GetMapping("/tracks")
     public String list(Model model, Principal principal) {
         model.addAttribute("tracks", trackRepo.findAll());
-        model.addAttribute("username", principal.getName());
+        model.addAttribute("username",
+                principal.getName().equals("default") ? "default" /* Нужно для тестирования */ : principal.getName());
 
         return "app/tracks";
     }

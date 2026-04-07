@@ -8,10 +8,8 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Основная цель этого теста — убедиться, что метод {@link Application#main(String[])}
  * корректно запускает Spring Boot контекст и не выбрасывает исключений при старте.
- * Тест использует {@link SpringBootTest} для поднятия полного Spring контекста,
  * как если бы приложение запускалось обычным образом через main‑метод.
  */
-@SpringBootTest
 class ApplicationTest {
     /**
      * Проверяет, что метод {@link Application#main(String[])} успешно стартует
