@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.config;
+package rf.mizuka.web.application.config.security;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import rf.mizuka.web.application.auth.database.repository.UserRepository;
-import rf.mizuka.web.application.auth.service.CustomUserDetailsService;
+import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.services.user.CustomUserDetailsService;
 
 /**
  * Централизованная конфигурация безопасности Spring Security для веб‑приложения.
@@ -76,7 +76,7 @@ import rf.mizuka.web.application.auth.service.CustomUserDetailsService;
  *   <li>Бин {@link org.springframework.security.core.userdetails.UserDetailsService UserDetailsService},
  *   возвращаемый методом {@code userDetailsService()}, — это кастомный сервис, основанный
  *   на {@code CustomUserDetailsService}, который читает данные пользователя из
- *   {@link rf.mizuka.web.application.auth.database.repository.UserRepository UserRepository}.
+ *   {@link UserRepository UserRepository}.
  *   Это стандартный паттерн Spring Security: информация о пользователе извлекается
  *   через {@code UserDetailsService}, а уже сама аутентификация выполняется через
  *   {@code DaoAuthenticationProvider}.</li>
@@ -117,9 +117,9 @@ public class SecurityConfig {
      * Репозиторий пользователей, используемый для загрузки данных пользователей из базы данных.
      *
      * <p>Поле вводится в контекст контроллера через {@link org.springframework.beans.factory.annotation.Autowired @Autowired},
-     * что позволяет Spring Security и {@link rf.mizuka.web.application.auth.service.CustomUserDetailsService CustomUserDetailsService}
+     * что позволяет Spring Security и {@link CustomUserDetailsService CustomUserDetailsService}
      * получать доступ к данным пользователей (логин, пароль, роли). В сочетании с интерфейсом
-     * {@link rf.mizuka.web.application.auth.database.repository.UserRepository UserRepository}
+     * {@link UserRepository UserRepository}
      * этот репозиторий обеспечивает стандартный доступ к сущностям {@code User} в базе данных,
      * предоставляя операции поиска и загрузки по идентификатору и логину.</p>
      *
@@ -391,7 +391,7 @@ public class SecurityConfig {
      * используемый Spring Security для аутентификации и загрузки данных пользователя.</p>
      *
      * <p>Сервис {@code CustomUserDetailsService} реализует интерфейс {@link org.springframework.security.core.userdetails.UserDetailsService UserDetailsService}
-     * и использует {@link rf.mizuka.web.application.auth.database.repository.UserRepository UserRepository}
+     * и использует {@link UserRepository UserRepository}
      * для загрузки данных пользователя по его логину. Это стандартный паттерн для работы с пользовательскими
      * данными в Spring Security.</p>
      *

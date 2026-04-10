@@ -1,11 +1,11 @@
-package rf.mizuka.web.application.tracks.database.repository;
+package rf.mizuka.web.application.database.tracks.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import rf.mizuka.web.application.tracks.models.Track;
+import rf.mizuka.web.application.models.tracks.Track;
 
 /**
- * Репозиторий для доступа к данным сущности {@link rf.mizuka.web.application.tracks.models.Track}.
+ * Репозиторий для доступа к данным сущности {@link Track}.
  *
  * <p>Интерфейс {@code TrackRepository} реализует паттерн <b>Repository</b> в контексте
  * Spring Data JPA и инкапсулирует логику взаимодействия с таблицей {@code tracks}

@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.dto;
+package rf.mizuka.web.application.dto.auth;
 
 /**
  * DTO‑класс для передачи данных с формы регистрации (логин / пароль / подтверждение пароля)

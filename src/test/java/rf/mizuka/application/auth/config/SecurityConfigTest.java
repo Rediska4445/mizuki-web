@@ -12,9 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import rf.mizuka.web.application.auth.config.SecurityConfig;
-import rf.mizuka.web.application.auth.database.repository.UserRepository;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.config.security.SecurityConfig;
+import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.services.user.UserService;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * Интеграционные тесты конфигурации безопасности {@link rf.mizuka.web.application.auth.config.SecurityConfig}.
+ * Интеграционные тесты конфигурации безопасности {@link SecurityConfig}.
  *
  * <p>Класс использует {@link SpringBootTest} совместно с {@link WebMvcTest}-подобным контекстом:
  * <ul>
@@ -76,7 +76,7 @@ public class SecurityConfigTest {
     @Autowired
     private MockMvc mockMvc;
     /**
-     * Mockito‑mock для репозитория {@link rf.mizuka.web.application.auth.database.repository.UserRepository}.
+     * Mockito‑mock для репозитория {@link UserRepository}.
      *
      * <p>Аннотация {@link MockitoBean} обеспечивает:
      * <ul>

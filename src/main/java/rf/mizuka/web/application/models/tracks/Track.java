@@ -1,7 +1,6 @@
-package rf.mizuka.web.application.tracks.models;
+package rf.mizuka.web.application.models.tracks;
 
 import jakarta.persistence.*;
-import rf.mizuka.web.application.auth.models.User;
 
 /**
  * ORM‑сущность JPA, представляющая аудиотрек (аудиофайл) в реляционной базе данных.

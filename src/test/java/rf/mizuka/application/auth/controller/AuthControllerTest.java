@@ -9,8 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import rf.mizuka.web.application.auth.controllers.AuthController;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.controllers.auth.AuthController;
+import rf.mizuka.web.application.services.user.UserService;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Unit-тесты для {@link rf.mizuka.web.application.auth.controllers.AuthController}.
+ * Unit-тесты для {@link AuthController}.
  *
  * <p>Класс использует аннотацию {@link WebMvcTest} для изолированного тестирования веб-слоя аутентификационного контроллера:
  * <ul>

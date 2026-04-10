@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
-import rf.mizuka.web.application.tracks.database.repository.TrackRepository;
-import rf.mizuka.web.application.tracks.models.Track;
+import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
+import rf.mizuka.web.application.models.tracks.Track;
 
 import java.util.List;
 import java.util.Optional;

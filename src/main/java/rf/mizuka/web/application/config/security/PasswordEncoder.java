@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.config;
+package rf.mizuka.web.application.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

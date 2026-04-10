@@ -8,14 +8,14 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
-import rf.mizuka.web.application.HomeController;
+import rf.mizuka.web.application.controllers.home.HomeController;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Unit-тесты для {@link rf.mizuka.web.application.HomeController}.
+ * Unit-тесты для {@link HomeController}.
  *
  * <p>Класс использует аннотацию {@link WebMvcTest} для тестирования только веб-слоя приложения:
  * <ul>

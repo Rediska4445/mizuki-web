@@ -7,10 +7,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.ui.Model;
-import rf.mizuka.web.application.tracks.controllers.TracksController;
-import rf.mizuka.web.application.tracks.database.repository.TrackRepository;
-import rf.mizuka.web.application.tracks.models.Track;
+import rf.mizuka.web.application.controllers.tracks.TracksController;
+import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
+import rf.mizuka.web.application.models.tracks.Track;
 
 import java.security.Principal;
 import java.util.List;

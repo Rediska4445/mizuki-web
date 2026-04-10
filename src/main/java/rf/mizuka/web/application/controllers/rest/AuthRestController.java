@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.controllers.api;
+package rf.mizuka.web.application.controllers.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import rf.mizuka.web.application.auth.dto.LoginForm;
-import rf.mizuka.web.application.auth.dto.RegisterForm;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.dto.auth.LoginForm;
+import rf.mizuka.web.application.dto.auth.RegisterForm;
+import rf.mizuka.web.application.services.user.UserService;
+import rf.mizuka.web.application.config.security.SecurityConfig;
 
 /**
  * REST API контроллер JSON аутентификации для SPA/мобильных клиентов (не HTML).
@@ -32,7 +33,7 @@ import rf.mizuka.web.application.auth.service.UserService;
  *
  * <h3>Зависимости (аналогично AuthController)</h3>
  * <ul>
- *   <li>{@link rf.mizuka.web.application.auth.service.UserService @Autowired} — регистрация в БД</li>
+ *   <li>{@link UserService @Autowired} — регистрация в БД</li>
  *   <li>{@link org.springframework.security.authentication.AuthenticationManager @Autowired} — аутентификация</li>
  * </ul>
  *
@@ -85,7 +86,7 @@ public class AuthRestController {
      * Сервис регистрации, идентичен HTML контроллеру — для POST /api/auth/register JSON.
      *
      * <p>{@link org.springframework.beans.factory.annotation.Autowired @Autowired} подставляет
-     * {@link rf.mizuka.web.application.auth.service.UserService} бин. Вызывается после проверки
+     * {@link UserService} бин. Вызывается после проверки
      * паролей для создания пользователя в БД:
      * <pre>
      * userService.registerUser(form.getUsername(), form.getPassword())
@@ -102,7 +103,7 @@ public class AuthRestController {
     /**
      * Spring Security AuthenticationManager для JSON логина — идентичен HTML версии.
      *
-     * <p>Инжектирует {@link rf.mizuka.web.application.auth.config.SecurityConfig#authenticationManager(DaoAuthenticationProvider)} ()} бин ({@link org.springframework.security.authentication.ProviderManager} с
+     * <p>Инжектирует {@link SecurityConfig#authenticationManager(DaoAuthenticationProvider)} ()} бин ({@link org.springframework.security.authentication.ProviderManager} с
      * {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}).</p>
      *
      * <p><b>REST аутентификация поток:</b>
@@ -209,7 +210,7 @@ public class AuthRestController {
      * </pre>
      *
      * <h3>STATELESS SecurityContext (критично)</h3>
-     * <p>Ручная установка для {@link rf.mizuka.web.application.auth.config.SecurityConfig#securityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS}:
+     * <p>Ручная установка для {@link SecurityConfig#securityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS}:
      * <pre>
      * SecurityContextHolder.createEmptyContext() → новый контекст
      * ↓ context.setAuthentication(authentication) ← сохраняет пользователя

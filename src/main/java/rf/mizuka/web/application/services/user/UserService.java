@@ -1,11 +1,11 @@
-package rf.mizuka.web.application.auth.service;
+package rf.mizuka.web.application.services.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rf.mizuka.web.application.auth.database.repository.UserRepository;
-import rf.mizuka.web.application.auth.models.User;
+import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.models.user.User;
 
 /**
  * Сервис для регистрации новых пользователей, интегрированный с Spring Security аутентификацией.
@@ -30,8 +30,8 @@ import rf.mizuka.web.application.auth.models.User;
  *         <li>Хэш сохраняется в поле {@code User.password} для последующей проверки при логине</li>
  *       </ul>
  *   </li>
- *   <li>{@link rf.mizuka.web.application.auth.database.repository.UserRepository @Autowired UserRepository} —
- *       Spring Data JPA репозиторий для работы с сущностью {@link rf.mizuka.web.application.auth.models.User}.
+ *   <li>{@link UserRepository @Autowired UserRepository} —
+ *       Spring Data JPA репозиторий для работы с сущностью {@link User}.
  *       Предоставляет методы {@code existsByUsername()} и {@code save()} для CRUD операций.
  *   </li>
  * </ul>
@@ -50,7 +50,7 @@ import rf.mizuka.web.application.auth.models.User;
  * <h3>Процесс регистрации</h3>
  * <ol>
  *   <li>Проверка уникальности: {@code userRepository.existsByUsername(username)} → исключение при дубликате</li>
- *   <li>Создание {@link rf.mizuka.web.application.auth.models.User}:</li>
+ *   <li>Создание {@link User}:</li>
  *     <ul>
  *       <li>{@code user.setUsername(username)} — логин пользователя</li>
  *       <li>{@code user.setPassword(passwordEncoder.encode(rawPassword))} — <b>BCrypt хэш</b> пароля</li>

@@ -9,11 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
-import rf.mizuka.web.application.auth.database.repository.UserRepository;
-import rf.mizuka.web.application.auth.models.User;
-import rf.mizuka.web.application.auth.service.CustomUserDetailsService;
+import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.services.user.CustomUserDetailsService;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest

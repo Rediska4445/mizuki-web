@@ -11,10 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import rf.mizuka.web.application.auth.controllers.api.AuthRestController;
-import rf.mizuka.web.application.auth.dto.LoginForm;
-import rf.mizuka.web.application.auth.dto.RegisterForm;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.controllers.rest.AuthRestController;
+import rf.mizuka.web.application.dto.auth.LoginForm;
+import rf.mizuka.web.application.dto.auth.RegisterForm;
+import rf.mizuka.web.application.services.user.UserService;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Интеграционные unit-тесты для REST‑контроллера аутентификации {@link rf.mizuka.web.application.auth.controllers.api.AuthRestController}.
+ * Интеграционные unit-тесты для REST‑контроллера аутентификации {@link AuthRestController}.
  *
  * <p>Класс использует аннотацию {@link WebMvcTest} для изолированного тестирования веб‑слоя:
  * <ul>
@@ -56,7 +56,7 @@ public class AuthRestControllerTest {
      *
      * <p>Предоставляет эмуляцию полного стека Spring MVC без запуска реального HTTP‑сервера:
      * <ul>
-     *   <li>Разбор {@link org.springframework.test.web.servlet.result.MockMvcResultMatchers} и маршрутизация к {@link rf.mizuka.web.application.auth.controllers.api.AuthRestController}</li>
+     *   <li>Разбор {@link org.springframework.test.web.servlet.result.MockMvcResultMatchers} и маршрутизация к {@link AuthRestController}</li>
      *   <li>Выполнение {@link org.springframework.web.servlet.DispatcherServlet} и обработка POST‑запросов с JSON‑телом</li>
      *   <li>Проверка статуса, заголовков и текстового тела ответа через {@link org.springframework.test.web.servlet.result.MockMvcResultMatchers}</li>
      * </ul>
@@ -66,7 +66,7 @@ public class AuthRestControllerTest {
     private MockMvc mockMvc;
 
     /**
-     * Jackson {@code ObjectMapper} для работы с JSON‑представлением DTO {@link rf.mizuka.web.application.auth.dto.RegisterForm}.
+     * Jackson {@code ObjectMapper} для работы с JSON‑представлением DTO {@link RegisterForm}.
      *
      * <p>Используется для:
      * <ul>
@@ -86,7 +86,7 @@ public class AuthRestControllerTest {
      * <p>Аннотация {@link MockitoBean} гарантирует:
      * <ul>
      *   <li>Замену реального {@link UserService} временной реализацией Mockito</li>
-     *   <li>Доступность мока через {@link Autowired} внутри {@link rf.mizuka.web.application.auth.controllers.api.AuthRestController}</li>
+     *   <li>Доступность мока через {@link Autowired} внутри {@link AuthRestController}</li>
      *   <li>Возможность настройки поведения метода {@link UserService#registerUser(String, String)}
      *       (успешная регистрация или выброс исключения)</li>
      * </ul>
@@ -103,7 +103,7 @@ public class AuthRestControllerTest {
      *   <li>Замену реального менеджера аутентификации на мок для теста</li>
      *   <li>Возможность моделировать успешную или неудачную аутентификацию через
      *       {@link org.mockito.Mockito#when(Object)}}</li>
-     *   <li>Изоляцию логики {@link rf.mizuka.web.application.auth.controllers.api.AuthRestController}
+     *   <li>Изоляцию логики {@link AuthRestController}
      *       от реальных провайдеров аутентификации (Ldap, JDBC и т.д.)</li>
      * </ul>
      * В данном тесте активно используется для проверки сценариев логина через REST‑API.
@@ -115,7 +115,7 @@ public class AuthRestControllerTest {
      *
      * <p>Проверяет сценарий корректной регистрации:
      * <ul>
-     *   <li>Создается валидная DTO {@link rf.mizuka.web.application.auth.dto.RegisterForm}
+     *   <li>Создается валидная DTO {@link RegisterForm}
      *       с совпадающими паролями</li>
      *   <li>POST‑запрос на {@code /api/auth/register} с телом в формате JSON и
      *       {@link MediaType#APPLICATION_JSON}</li>
@@ -139,7 +139,7 @@ public class AuthRestControllerTest {
      *
      * <p>Проверяет сценарий ошибки на стороне сервера:
      * <ul>
-     *   <li>Создается некорректная DTO {@link rf.mizuka.web.application.auth.dto.RegisterForm}
+     *   <li>Создается некорректная DTO {@link RegisterForm}
      *       с разными значениями {@code password} и {@code confirmPassword}</li>
      *   <li>POST‑запрос на {@code /api/auth/register} с JSON‑телом и типом контента {@code application/json}</li>
      *   <li>Ожидаемый результат: {@code 400 Bad Request} и текстовый ответ "Passwords do not match."</li>
@@ -162,7 +162,7 @@ public class AuthRestControllerTest {
      *
      * <p>Проверяет сценарий корректной аутентификации:
      * <ul>
-     *   <li>Создается валидная DTO {@link rf.mizuka.web.application.auth.dto.LoginForm} с логином и паролем</li>
+     *   <li>Создается валидная DTO {@link LoginForm} с логином и паролем</li>
      *   <li>Мок {@link AuthenticationManager} возвращает {@link org.springframework.security.core.Authentication}
      *       с корректными учетными данными и ролью {@code ROLE_USER}</li>
      *   <li>POST‑запрос на {@code /api/auth/login} с телом в формате JSON</li>
@@ -191,7 +191,7 @@ public class AuthRestControllerTest {
      *
      * <p>Проверяет сценарий ошибочного входа:
      * <ul>
-     *   <li>Создается DTO {@link rf.mizuka.web.application.auth.dto.LoginForm} с несуществующими/неправильными данными</li>
+     *   <li>Создается DTO {@link LoginForm} с несуществующими/неправильными данными</li>
      *   <li>Мок {@link AuthenticationManager} выбрасывает {@link org.springframework.security.authentication.BadCredentialsException}
      *       с сообщением "Invalid username or password"</li>
      *   <li>POST‑запрос на {@code /api/auth/login} с JSON‑телом</li>

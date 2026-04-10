@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.controllers;
+package rf.mizuka.web.application.controllers.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import rf.mizuka.web.application.auth.service.UserService;
-import rf.mizuka.web.application.auth.dto.LoginForm;
-import rf.mizuka.web.application.auth.dto.RegisterForm;
+import rf.mizuka.web.application.services.user.CustomUserDetailsService;
+import rf.mizuka.web.application.services.user.UserService;
+import rf.mizuka.web.application.dto.auth.LoginForm;
+import rf.mizuka.web.application.dto.auth.RegisterForm;
+import rf.mizuka.web.application.config.security.SecurityConfig;
+import rf.mizuka.web.application.models.user.User;
 
 /**
  * MVC контроллер HTML-страниц аутентификации (login/register) для Spring Security.
@@ -35,7 +38,7 @@ import rf.mizuka.web.application.auth.dto.RegisterForm;
  *   <li>{@link org.springframework.security.authentication.AuthenticationManager @Autowired} — центральный
  *       компонент Spring Security для аутентификации. Вызывает цепочку
  *       {@link org.springframework.security.authentication.ProviderManager} → {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}</li>
- *   <li>{@link rf.mizuka.web.application.auth.service.UserService @Autowired} — регистрация пользователей в БД</li>
+ *   <li>{@link UserService @Autowired} — регистрация пользователей в БД</li>
  * </ul>
  *
  * <h3>Полный поток аутентификации (ручной, без formLogin):</h3>
@@ -85,7 +88,7 @@ import rf.mizuka.web.application.auth.dto.RegisterForm;
  *
  * @see org.springframework.security.authentication.AuthenticationManager
  * @see org.springframework.security.core.context.SecurityContextHolder
- * @see rf.mizuka.web.application.auth.service.UserService
+ * @see UserService
  */
 @Controller
 @RequestMapping("/auth")
@@ -94,12 +97,12 @@ public class AuthController {
      * Сервис регистрации пользователей, инжектируемый для обработки POST /auth/register.
      *
      * <p>Spring {@link org.springframework.beans.factory.annotation.Autowired @Autowired} подставляет бин
-     * {@link rf.mizuka.web.application.auth.service.UserService} из {@link rf.mizuka.web.application.auth.config.SecurityConfig#userDetailsService()}.
+     * {@link UserService} из {@link SecurityConfig#userDetailsService()}.
      * Используется исключительно в {@link #register(RegisterForm, Model)} для:
      * <ul>
      *   <li>Проверки уникальности username через {@code existsByUsername()}</li>
      *   <li>Хеширования пароля BCrypt через {@code passwordEncoder.encode()}</li>
-     *   <li>Сохранения {@link rf.mizuka.web.application.auth.models.User} в БД через {@code userRepository.save()}</li>
+     *   <li>Сохранения {@link User} в БД через {@code userRepository.save()}</li>
      * </ul>
      */
     @Autowired
@@ -108,7 +111,7 @@ public class AuthController {
      * Центральный компонент Spring Security для ручной аутентификации пользователей.
      *
      * <p>{@link org.springframework.beans.factory.annotation.Autowired @Autowired} подставляет бин
-     * {@link rf.mizuka.web.application.auth.config.SecurityConfig#authenticationManager(DaoAuthenticationProvider)}} — {@link org.springframework.security.authentication.ProviderManager},
+     * {@link SecurityConfig#authenticationManager(DaoAuthenticationProvider)}} — {@link org.springframework.security.authentication.ProviderManager},
      * содержащий {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}.</p>
      *
      * <p><b>Критическая роль в {@link #login(LoginForm, Model)}:</b>
@@ -213,7 +216,7 @@ public class AuthController {
      * </pre>
      *
      * <h3>Ручная установка SecurityContext (STATELESS режим)</h3>
-     * <p>Поскольку {@link rf.mizuka.web.application.auth.config.SecurityConfig#securityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS},
+     * <p>Поскольку {@link SecurityConfig#securityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS},
      * SecurityContext НЕ сохраняется автоматически:
      * <pre>
      * SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -319,7 +322,7 @@ public class AuthController {
      * <p><b>После успешной регистрации:</b><br/>
      * 1. Пользователь создан в БД с BCrypt паролем<br/>
      * 2. Редирект на /auth/login для немедленного логина<br/>
-     * 3. {@link rf.mizuka.web.application.auth.service.CustomUserDetailsService#loadUserByUsername(String)} ()} найдет нового пользователя
+     * 3. {@link CustomUserDetailsService#loadUserByUsername(String)} ()} найдет нового пользователя
      * </p>
      *
      * <p><b>Совместимость с SecurityFilterChain:</b><br/>

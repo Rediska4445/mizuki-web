@@ -1,10 +1,10 @@
-package rf.mizuka.web.application.auth.database.repository;
+package rf.mizuka.web.application.database.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import rf.mizuka.web.application.auth.models.User;
-import rf.mizuka.web.application.auth.service.CustomUserDetailsService;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.services.user.CustomUserDetailsService;
+import rf.mizuka.web.application.services.user.UserService;
 
 import java.util.Optional;
 /**
@@ -53,8 +53,8 @@ import java.util.Optional;
  * Интерфейс автоматически реализуется Spring Data JPA proxy во время запуска.</p>
  *
  * @see org.springframework.data.jpa.repository.JpaRepository
- * @see rf.mizuka.web.application.auth.service.UserService
- * @see rf.mizuka.web.application.auth.service.CustomUserDetailsService
+ * @see UserService
+ * @see CustomUserDetailsService
  */
 @Repository
 public interface UserRepository

@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.tracks.controllers;
+package rf.mizuka.web.application.controllers.tracks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import rf.mizuka.web.application.tracks.database.repository.TrackRepository;
-import rf.mizuka.web.application.tracks.models.Track;
+import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
+import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.models.tracks.Track;
 
 import java.security.Principal;
 
@@ -50,7 +51,7 @@ import java.security.Principal;
  *   {@code Model} для передачи данных в шаблон:
  *   <ul>
  *     <li>через {@link org.springframework.ui.Model#addAttribute(String, Object) addAttribute}
- *     в модель добавляется список всех треков, загружаемых через {@link rf.mizuka.web.application.tracks.database.repository.TrackRepository TrackRepository#findAll()};
+ *     в модель добавляется список всех треков, загружаемых через {@link TrackRepository TrackRepository#findAll()};
  *     этот вызов делегируется Spring Data JPA‑репозиторию и в итоге превращается в JPA‑запрос к
  *     таблице {@code tracks}, результат которого маппится на набор сущностей {@code Track}.</li>
  *     <li>имя пользователя также добавляется в модель, чтобы шаблон мог отображать
@@ -79,7 +80,7 @@ import java.security.Principal;
  *   что позволяет контроллеру делегировать работу с базой данных репозиторию, а не выполнять
  *   операции с {@code EntityManager} или JPA напрямую. Это обеспечивает слабую связность
  *   и соблюдение принципа инверсии управления.</li>
- *   <li>Сервисы авторизации, работающие с объектами типа {@link rf.mizuka.web.application.auth.models.User User},
+ *   <li>Сервисы авторизации, работающие с объектами типа {@link User User},
  *   обычно находятся в соседних слоях; контроллер в данном случае использует только
  *   представление имени пользователя для отображения и не включает сложную логику аутентификации.</li>
  * </ul>
@@ -100,7 +101,7 @@ import java.security.Principal;
 @RequestMapping("/app")
 public class TracksController {
     /**
-     * Репозиторий сущности {@link rf.mizuka.web.application.tracks.models.Track},
+     * Репозиторий сущности {@link Track},
      * введённый через встроенную поддержку DI в Spring.
      *
      * <p>Поле помечено аннотацией {@link org.springframework.beans.factory.annotation.Autowired @Autowired},
@@ -139,7 +140,7 @@ public class TracksController {
      *
      * <p>Параметр {@link org.springframework.ui.Model Model} используется для передачи данных
      * в шаблон (view): в модели добавляется список всех треков, полученных через
-     * {@link rf.mizuka.web.application.tracks.database.repository.TrackRepository TrackRepository#findAll()},
+     * {@link TrackRepository TrackRepository#findAll()},
      * и имя пользователя, взятое из {@link java.security.Principal Principal#getName()}.
      * Это стандартный подход MVC‑слоя Spring: контроллер подготавливает модель,
      * а шаблон отображает её в HTML‑страницу.</p>
@@ -176,9 +177,9 @@ public class TracksController {
      * использует стандартный механизм Spring MVC для обработки загрузок файлов через HTTP:
      * файл передаётся как часть тела запроса, а Spring автоматически декодирует его в объект
      * {@code MultipartFile} с метаданными (например, {@code getOriginalFilename()}).
-     * Если файл не пустой, метод создаёт новую сущность {@link rf.mizuka.web.application.tracks.models.Track Track},
+     * Если файл не пустой, метод создаёт новую сущность {@link Track Track},
      * устанавливает в неё имя, равное исходному имени загруженного файла, и сохраняет её
-     * через {@link rf.mizuka.web.application.tracks.database.repository.TrackRepository TrackRepository#save(Track)}.</p>
+     * через {@link TrackRepository TrackRepository#save(Track)}.</p>
      *
      * <p>После загрузки сообщение об успешном действии (например, {@code "Загружен: ..."})
      * добавляется в объект {@link org.springframework.web.servlet.mvc.support.RedirectAttributes RedirectAttributes}

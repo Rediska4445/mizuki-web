@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.auth.service;
+package rf.mizuka.web.application.services.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rf.mizuka.web.application.auth.database.repository.UserRepository;
+import rf.mizuka.web.application.database.user.repository.UserRepository;
 
 /**
  * Обязательная реализация UserDetailsService для Spring Security DAO-аутентификации из БД.

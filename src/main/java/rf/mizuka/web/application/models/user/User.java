@@ -1,11 +1,11 @@
-package rf.mizuka.web.application.auth.models;
+package rf.mizuka.web.application.models.user;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import rf.mizuka.web.application.auth.service.CustomUserDetailsService;
-import rf.mizuka.web.application.auth.service.UserService;
+import rf.mizuka.web.application.services.user.CustomUserDetailsService;
+import rf.mizuka.web.application.services.user.UserService;
 
 import java.util.Collection;
 import java.util.Collections;
