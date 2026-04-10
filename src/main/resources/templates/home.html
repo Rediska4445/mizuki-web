@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>Mizuka Web</title>
 </head>
@@ -7,11 +7,17 @@
     <h1>Mizuka Web</h1>
 
     <form th:action="@{/auth/register}" method="get">
-        <button type="submit">Вход</button>
+        <button type="submit">Sign in</button>
     </form>
 
     <form th:action="@{/app/tracks}" method="get">
-        <button type="submit">Треки</button>
+        <button type="submit">Tracks</button>
     </form>
+
+    <div sec:authorize="isAuthenticated()">
+        <a th:href="@{/developers/developer-dashboard}" class="btn btn-primary">
+            For Developers
+        </a>
+    </div>
 </body>
 </html>

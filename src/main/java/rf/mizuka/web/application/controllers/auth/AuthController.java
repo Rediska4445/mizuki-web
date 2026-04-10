@@ -18,7 +18,7 @@ import rf.mizuka.web.application.services.user.CustomUserDetailsService;
 import rf.mizuka.web.application.services.user.UserService;
 import rf.mizuka.web.application.dto.auth.LoginForm;
 import rf.mizuka.web.application.dto.auth.RegisterForm;
-import rf.mizuka.web.application.config.security.SecurityConfig;
+import rf.mizuka.web.application.security.config.SecurityConfig;
 import rf.mizuka.web.application.models.user.User;
 
 /**

@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import rf.mizuka.web.application.config.security.SecurityConfig;
+import rf.mizuka.web.application.security.config.SecurityConfig;
 import rf.mizuka.web.application.database.user.repository.UserRepository;
 import rf.mizuka.web.application.services.user.UserService;
 

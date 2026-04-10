@@ -352,12 +352,12 @@ public class HomeControllerTest {
     }
 
     /**
-     * Тест проверки корректной работы аннотации @Controller (не @RestController).
+     * Тест проверки корректной работы аннотации @Controller (не @RestApiController).
      *
-     * <p>Проверяет ключевое различие между {@code @Controller} и {@code @RestController}:
+     * <p>Проверяет ключевое различие между {@code @Controller} и {@code @RestApiController}:
      * <ul>
      *   <li>@Controller → возвращает ИМЯ VIEW ("home") → HTML через ViewResolver</li>
-     *   <li>@RestController → возвращает JSON/строку напрямую → НЕТ ViewResolver</li>
+     *   <li>@RestApiController → возвращает JSON/строку напрямую → НЕТ ViewResolver</li>
      * </ul>
      */
     @Test

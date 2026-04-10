@@ -1,8 +1,9 @@
-package rf.mizuka.web.application.config.security;
+package rf.mizuka.web.application.security.config;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,8 +28,12 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import rf.mizuka.web.application.database.rest.repository.DeveloperRepository;
 import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.models.rest.Developer;
 import rf.mizuka.web.application.services.user.CustomUserDetailsService;
+
+import java.util.Set;
 
 /**
  * Централизованная конфигурация безопасности Spring Security для веб‑приложения.
@@ -155,126 +161,8 @@ public class SecurityConfig {
     @Qualifier("bCryptPasswordEncoder")
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * Конфигурирует и возвращает главную цепочку фильтров безопасности Spring Security с приоритетом 1.
-     *
-     * <p>В Spring Security 6+ используется компонент-бин {@link SecurityFilterChain @Bean SecurityFilterChain},
-     * который представляет собой упорядоченную цепочку фильтров безопасности. Когда HTTP-запрос приходит в
-     * контейнер сервлетов (Tomcat), он сначала проходит через фильтр {@link org.springframework.web.filter.DelegatingFilterProxy}
-     * с именем "springSecurityFilterChain". Этот прокси делегирует обработку {@link org.springframework.security.web.FilterChainProxy},
-     * который сканирует все доступные бины SecurityFilterChain, сортирует их по {@link Order @Order} и выбирает
-     * первую (с наименьшим значением Order) цепочку, чьи requestMatchers() подходят под текущий запрос.
-     * {@code @Order(1)} гарантирует высший приоритет среди других цепочек.</p>
-     *
-     * <h3>1. SecurityContext (Хранение контекста аутентификации)</h3>
-     * <p>{@code .securityContext(securityContext -> ...)} настраивает {@link SecurityContextRepository},
-     * который отвечает за персистентность {@link SecurityContext} между запросами:
-     * <ul>
-     *   <li>{@code new HttpSessionSecurityContextRepository()} — стандартный репозиторий Spring Security,
-     *       сохраняет SecurityContext в атрибуте сессии {@code "SPRING_SECURITY_CONTEXT"} под ключом
-     *       {@link HttpSessionSecurityContextRepository#SPRING_SECURITY_CONTEXT_KEY SPRING_SECURITY_CONTEXT_KEY}</li>
-     *   <li>{@code requireExplicitSave(false)} — отключает требование явного вызова
-     *       {@code securityContextRepository.saveContext()}. SecurityContext автоматически сохраняется:
-     *       <ul>
-     *         <li>при завершении запроса (postHandle/afterCompletion)</li>
-     *         <li>при изменении аутентификации (setAuthentication())</li>
-     *       </ul>
-     *   </li>
-     * </ul>
-     * Если сессия не существует, создается новая. SecurityContext содержит {@link Authentication} текущего пользователя.
-     * </p>
-     *
-     * <h3>2. Авторизация HTTP-запросов</h3>
-     * <p>{@code .authorizeHttpRequests(auth -> ...)} заменяет устаревшие {@code antMatchers()} и определяет
-     * правила доступа:
-     * <table border="1">
-     *   <tr><th>Путь</th><th>Доступ</th><th>Фильтр</th></tr>
-     *   <tr><td>{@code /api/auth/**}</td><td>permitAll()</td><td>Все пользователи</td></tr>
-     *   <tr><td>{@code /auth/login}, {@code /auth/register}</td><td>permitAll()</td><td>Все пользователи</td></tr>
-     *   <tr><td>ВСЕ остальные</td><td>authenticated()</td><td>Только аутентифицированные</td></tr>
-     * </table>
-     * Проверка происходит последним фильтром цепочки. Если пользователь не аутентифицирован для protected-ресурса,
-     * выбрасывается {@link org.springframework.security.access.AccessDeniedException} или
-     * {@link org.springframework.security.core.AuthenticationException}.
-     * </p>
-     *
-     * <h3>3. Обработка исключений безопасности</h3>
-     * <p>{@code .exceptionHandling(ex -> ...)} перехватывает исключения ДО их передачи в контейнер сервлетов:
-     * <ul>
-     *   <li><b>{@link AuthenticationEntryPoint}</b> — вызывается при отсутствии аутентификации
-     *       ({@code 401 Unauthorized}):
-     *     <ul>
-     *       <li>API-запросы ({@code /api/*}) → {@code response.setStatus(401)}</li>
-     *       <li>HTML-запросы → {@link LoginUrlAuthenticationEntryPoint} редиректит на
-     *           {@code /auth/login?error} с параметрами из {@link AuthenticationException}</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>{@link AccessDeniedHandler}</b> — вызывается при наличии аутентификации, но отсутствии прав
-     *       ({@code 403 Forbidden}):
-     *     <ul>
-     *       <li>API-запросы ({@code /api/*}) → {@code response.setStatus(403)}</li>
-     *       <li>HTML-запросы → {@code response.sendRedirect("/auth/login")}</li>
-     *     </ul>
-     *   </li>
-     * </ul>
-     * Обработчики регистрируются в {@link org.springframework.security.web.access.ExceptionTranslationFilter}.
-     * </p>
-     *
-     * <h3>4. Управление сессиями (STATELESS)</h3>
-     * <p>{@code .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))}
-     * полностью отключает серверные сессии:
-     * <ul>
-     *   <li>НЕ создаются {@link HttpSession}</li>
-     *   <li>{@link HttpSessionSecurityContextRepository} игнорируется</li>
-     *   <li>НЕ устанавливаются куки {@code JSESSIONID}</li>
-     *   <li>Каждый запрос должен содержать полную информацию аутентификации (JWT в Authorization header)</li>
-     * </ul>
-     * Идеально для REST API + SPA приложений. Конфликт с securityContext() игнорируется Spring Security.
-     * </p>
-     *
-     * <h3>5. CSRF Защита</h3>
-     * <p>{@code .csrf(csrf -> ...)} настраивает {@link org.springframework.security.web.csrf.CsrfFilter}:
-     * <ul>
-     *   <li>{@code .ignoringRequestMatchers("/api/**")} — API полностью игнорирует CSRF проверки
-     *       (GET, HEAD, TRACE, OPTIONS автоматически игнорируются)</li>
-     *   <li>{@code CookieCsrfTokenRepository.withHttpOnlyFalse()} — CSRF-токен хранится в куки:
-     *     <table border="1">
-     *       <tr><th>Параметр</th><th>Значение</th></tr>
-     *       <tr><td>Имя куки</td><td>{@code XSRF-TOKEN}</td></tr>
-     *       <tr><td>HttpOnly</td><td>{@code false} (доступно JavaScript)</td></tr>
-     *       <tr><td>Заголовок</td><td>Клиент должен отправить {@code X-XSRF-TOKEN}</td></tr>
-     *     </table>
-     *     SPA (React/Angular) читает куки и добавляет заголовок автоматически.
-     *   </li>
-     * </ul>
-     * </p>
-     *
-     * <h3>6. Отключение встроенной формы логина</h3>
-     * <p>{@code .formLogin(AbstractHttpConfigurer::disable)} полностью отключает:
-     * <ul>
-     *   <li>{@link org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter}</li>
-     *   <li>Автоматические HTML-страницы логина Spring Security</li>
-     *   <li>POST {@code /login} эндпоинт</li>
-     * </ul>
-     * Логин реализуется вручную через контроллер + {@link AuthenticationManager}.
-     * </p>
-     *
-     * <p><b>Полный поток обработки запроса:</b><br/>
-     * 1. DelegatingFilterProxy → FilterChainProxy → SecurityFilterChain (@Order=1)<br/>
-     * 2. SecurityContextPersistenceFilter (loadContext)<br/>
-     * 3. ... другие фильтры ...<br/>
-     * 4. FilterSecurityInterceptor (проверка authorizeHttpRequests)<br/>
-     * 5. ExceptionTranslationFilter (обработка исключений)<br/>
-     * 6. Ваш контроллер/ресурс<br/>
-     * 7. SecurityContextPersistenceFilter (saveContext, если не STATELESS)
-     * </p>
-     *
-     * @param http {@link HttpSecurity} для fluent-конфигурации цепочки фильтров
-     * @return полностью настроенная {@link SecurityFilterChain} для регистрации Spring контейнером
-     * @throws Exception при ошибках конфигурации фильтров
-     */
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityContext(securityContext -> securityContext
@@ -282,37 +170,48 @@ public class SecurityConfig {
                         .requireExplicitSave(false)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/favicon.ico", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/dashboard/developers/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            if (request.getServletPath().startsWith("/api/")) {
-                                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            } else {
-                                new LoginUrlAuthenticationEntryPoint("/auth/login")
-                                        .commence(request, response, authException);
-                            }
+                            new LoginUrlAuthenticationEntryPoint("/auth/login")
+                                    .commence(request, response, authException);
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            if (request.getServletPath().startsWith("/api/")) {
-                                response.setStatus(HttpStatus.FORBIDDEN.value());
-                            } else {
-                                response.sendRedirect("/auth/login");
-                            }
+                            response.sendRedirect("/auth/login");
                         })
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+
+        return http.build();
+    }
+
     /**
      * Создает кастомный обработчик отказа в доступе (AccessDeniedHandler) для различения API и HTML запросов.
      *
