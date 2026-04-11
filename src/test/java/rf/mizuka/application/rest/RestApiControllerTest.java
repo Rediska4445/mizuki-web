@@ -5,16 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import rf.mizuka.web.application.services.rest.AuthApiService;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -40,6 +35,16 @@ public class RestApiControllerTest {
                         ))
                 .andExpect(status().is(418))
                 .andExpect(jsonPath("$.access").value("GRANTED_BUT_NO_CAFFEINE"));
+    }
+
+    @Test
+    @DisplayName("Должен вернуть ошибку вместо редиректа")
+    void shouldGetTheError() throws Exception {
+        mockMvc.perform(get("/api/unknown_page_which_exactly_not_will_be_exist")
+                        .with(jwt()
+                                .jwt(builder -> builder.subject("test-client"))
+                        ))
+                .andExpect(status().is(404));
     }
 
     @Test

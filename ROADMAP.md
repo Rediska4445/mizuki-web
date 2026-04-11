@@ -8,5 +8,5 @@
 4. 03.04.2026 - Make it possible to upload to the server and view a list of tracks already uploaded to the server (via Spring Data) (✓)
 5. 05.04.2026 - 06.04.2026 - Create a complete simple authentication system (via Spring Security) (✓)
 6. 06.04.2026 - 07.04.2026 - Write the test of code (✓)
-7. Add permission role for using rest api (-)
-8. Fix auth rest api [He response with 302 on errors] (-) 
+7. 10.04.2026 - 10.04.2026 - Add permission role for using rest api (✓)
+8. 11.04.2026 - 11.04.2026 - Fix auth rest api (He response with 302 on errors) (✓)

@@ -165,6 +165,11 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher(path -> {
+                    System.out.println(path.getRequestURI());
+
+                    return !path.getRequestURI().startsWith("/api") && !path.getRequestURI().startsWith("/error");
+                })
                 .securityContext(securityContext -> securityContext
                         .securityContextRepository(new HttpSessionSecurityContextRepository())
                         .requireExplicitSave(false)
@@ -176,13 +181,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            new LoginUrlAuthenticationEntryPoint("/auth/login")
-                                    .commence(request, response, authException);
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendRedirect("/auth/login");
-                        })
+                        .authenticationEntryPoint((request, response, authException) -> new LoginUrlAuthenticationEntryPoint("/auth/login")
+                                .commence(request, response, authException))
+                        .accessDeniedHandler((request, response, accessDeniedException) -> response.sendRedirect("/auth/login"))
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -204,7 +205,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
