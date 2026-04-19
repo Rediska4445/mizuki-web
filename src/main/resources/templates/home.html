@@ -2,22 +2,33 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>Mizuka Web</title>
+    <link rel="stylesheet" href="/css/main-landing.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <h1>Mizuka Web</h1>
+<div class="container">
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Mizuka Web</h1>
+            <p class="hero-subtitle">Spring Framework 4</p>
+        </div>
+    </header>
 
-    <form th:action="@{/auth/register}" method="get">
-        <button type="submit">Sign in</button>
-    </form>
+    <div class="main-buttons">
+        <form th:action="@{/auth/register}" method="get" class="inline-form">
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
 
-    <form th:action="@{/app/tracks}" method="get">
-        <button type="submit">Tracks</button>
-    </form>
+        <form th:action="@{/app/tracks}" method="get" class="inline-form">
+            <button type="submit" class="btn btn-primary">Tracks</button>
+        </form>
+    </div>
 
-    <div sec:authorize="isAuthenticated()">
-        <a th:href="@{/developers/developer-dashboard}" class="btn btn-primary">
+    <div sec:authorize="isAuthenticated()" class="dev-section">
+        <a th:href="@{/developers/developer-dashboard}" class="btn btn-secondary">
             For Developers
         </a>
     </div>
+</div>
 </body>
 </html>

@@ -234,6 +234,78 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Загружает пользователя из БД по логину для Spring Security аутентификации.
+     *
+     * <p><b>Критическая роль в Spring Security:</b> Вызывается {@link org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(String)}
+     * при каждом логине через {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider}.</p>
+     *
+     * <h3>Механизм работы в Spring Security Authentication:</h3>
+     * <ol>
+     *   <li>Клиент делает {@code POST /auth/login {username: "user", password: "pass123"}};</li>
+     *   <li>{@link org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter UsernamePasswordAuthenticationFilter}
+     *      извлекает username/password из request;</li>
+     *   <li>{@link org.springframework.security.authentication.AuthenticationManager AuthenticationManager} →
+     *      {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider DaoAuthenticationProvider};</li>
+     *   <li><strong>DaoAuthenticationProvider вызывает:</strong><br/>
+     *      {@code UserDetailsService.loadUserByUsername("user") → этот метод}</li>
+     *   <li>Spring Data JPA: {@code userRepository.findByUsername("user")} →<br/>
+     *      {@code SELECT * FROM users WHERE username = ? LIMIT 1} → {@link java.util.Optional}&lt;User&gt;;</li>
+     *   <li>При отсутствии пользователя:<br/>
+     *      {@code orElseThrow(() → new RuntimeException("User not found: " + username))}</li>
+     *   <li>Возврат {@link User} → проверка пароля {@code passwordEncoder.matches(raw, user.getPassword())}</li>
+     * </ol>
+     *
+     * <h3>Spring Data JPA механизм под капотом:</h3>
+     * <ul>
+     *   <li>{@link UserRepository#findByUsername(String)} — метод сгенерирован Spring Data JPA по соглашению;</li>
+     *   <li>Парсинг имени метода → JPQL: {@code SELECT u FROM User u WHERE u.username = ?1};</li>
+     *   <li>Автоматическая привязка параметра {@code ?1 = username};</li>
+     *   <li>Возврат {@link java.util.Optional}&lt;User&gt; (пустой при отсутствии записи);</li>
+     * </ul>
+     *
+     * <h3>Транзакционность (наследуется от класса):</h3>
+     * <ul>
+     *   <li>{@link org.springframework.transaction.annotation.Transactional @Transactional} — READ ONLY по умолчанию;</li>
+     *   <li>Кэшируется в 1st level cache Hibernate (повторные вызовы за 1 запрос — бесплатно);</li>
+     *   <li>Автоматический rollback НЕ нужен (только чтение);</li>
+     * </ul>
+     *
+     * <h3>Обработка отсутствия пользователя:</h3>
+     * <pre>
+     * findByUsername("nonexistent") →
+     * Optional.empty() → RuntimeException("User not found: nonexistent") →
+     * GlobalExceptionHandler → HTTP 500 {"error": "An error occurred", "message": "User not found: nonexistent"}
+     * </pre>
+     *
+     * <h3>Интеграция с PasswordEncoder проверкой:</h3>
+     * <table border="1">
+     *   <tr><th>Этап</th><th>Метод сервиса</th><th>DaoAuthenticationProvider</th></tr>
+     *   <tr><td>1. Поиск</td><td>{@code findByUsername("user")}</td><td>{@code UserDetailsService.loadUserByUsername()}</td></tr>
+     *   <tr><td>2. User</td><td>{@code return User {username, password="$2a$10$..."}}</td><td>Получает UserDetails</td></tr>
+     *   <tr><td>3. Пароль</td><td>-</td><td>{@code passwordEncoder.matches("pass123", "$2a$10$...") → true}</td></tr>
+     * </table>
+     *
+     * <p><b>Почему возвращает User, а не UserDetails:</b><br/>
+     * {@link User} реализует {@link org.springframework.security.core.userdetails.UserDetails UserDetails} (JPA Entity + Security интерфейс).
+     * Spring Security автоматически приводит {@code User} → {@code UserDetails}.</p>
+     *
+     * <p><b>Производительность:</b>
+     * <ul>
+     *   <li>1 SQL запрос с индексом на {@code username} (обязательно!);</li>
+     *   <li>Hibernate 2nd level cache (при {@code @Cacheable} — опционально);</li>
+     *   <li>Ленивая загрузка связанных сущностей (roles/permissions — по требованию).</li>
+     * </ul>
+     * </p>
+     *
+     * <p><b>Исключение RuntimeException обрабатывается:</b><br/>
+     * {@link rf.mizuka.web.GlobalExceptionHandler} → HTTP 500.<br/>
+     * <b>Рекомендация:</b> Создать {@code @ExceptionHandler(UserNotFoundException.class)} → HTTP 404.</p>
+     *
+     * @param username логин пользователя (точно такой же, как в БД и Authentication.principal)
+     * @return {@link User} сущность из БД с BCrypt паролем (реализует UserDetails)
+     * @throws RuntimeException если пользователь не найден ({@code User not found: username})
+     */
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));

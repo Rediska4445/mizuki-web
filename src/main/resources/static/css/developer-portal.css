@@ -1,0 +1,262 @@
+/* Reset и базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #fafafa;
+    padding: 2rem 1rem;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Success Alert */
+.success-alert {
+    background: linear-gradient(135deg, #10b981, #DED500);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.success-alert h3 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.credentials {
+    background: rgba(255,255,255,0.15);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.credentials div {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+code {
+    background: rgba(255,255,255,0.9);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    color: #1a1a1a;
+}
+
+/* Table */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.apps-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.apps-table th {
+    background: #f8f9fa;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.95rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.apps-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.apps-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* Card */
+.new-app-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.new-app-form {
+    padding: 2rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background: #1a1a1a;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 26, 26, 0.4);
+}
+
+/* Специальные кнопки */
+.btn-primary {
+    background: #1a1a1a;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(26, 26, 26, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.btn-regenerate {
+    background: #dc3545;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-regenerate:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.inline-form {
+    display: inline;
+}
+
+.inline-form {
+    display: inline;
+}
+
+/* Page Actions */
+.page-actions {
+    text-align: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .apps-table {
+        font-size: 0.9rem;
+    }
+
+    .apps-table th,
+    .apps-table td {
+        padding: 1rem 0.75rem;
+    }
+
+    .new-app-form {
+        padding: 1.5rem;
+    }
+
+    .success-alert {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .credentials {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .apps-table th:nth-child(3),
+    .apps-table td:nth-child(3) {
+        text-align: center;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+
+    .page-actions .btn {
+        width: auto;
+    }
+}

@@ -1,33 +1,54 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
-  <title>Mizuka - Регистрация</title>
+  <title>Mizuka - Sign up</title>
+  <link rel="stylesheet" th:href="@{/css/auth.css}" />
+  <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
 </head>
 <body>
-<h1>Регистрация</h1>
+<div class="container">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1>Sign up</h1>
+      <p>Create account</p>
+    </header>
 
-<!-- Ошибка регистрации -->
-<div th:if="${registerError}" th:text="${registerError}" style="color:red;"></div>
+    <div th:if="${registerError}" class="error-alert">
+      <span th:text="${registerError}"></span>
+    </div>
 
-<!-- Форма регистрации -->
-<form th:action="@{/auth/register}" th:object="${registerForm}" method="post">
-  <div>
-    <label>Логин:</label>
-    <input type="text" th:field="*{username}" required />
-  </div>
-  <div>
-    <label>Пароль:</label>
-    <input type="password" th:field="*{password}" required />
-  </div>
-  <div>
-    <label>Повторите пароль:</label>
-    <input type="password" th:field="*{confirmPassword}" required />
-  </div>
-  <button type="submit">Зарегистрироваться</button>
-</form>
+    <form th:action="@{/auth/register}" th:object="${registerForm}" method="post" class="auth-form">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" th:field="*{username}" required />
+      </div>
 
-<hr />
-<a th:href="@{/auth/login}">Войти</a>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" th:field="*{password}" required />
+      </div>
+
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Sign up</button>
+    </form>
+
+    <div class="auth-footer">
+      <hr class="separator" />
+      <a th:href="@{/auth/login}" class="auth-link">Have an account? Sign in</a>
+    </div>
+  </div>
+
+  <div sec:authorize="isAuthenticated()" class="home-button-wrapper">
+    <a href="/" class="back-to-home">
+      Home
+    </a>
+  </div>
+</div>
 </body>
 </html>

@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Mizuka Web - Tracks</title>
+    <link rel="stylesheet" th:href="@{/css/tracks.css}" />
+    <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
 </head>
 <body>
-  <div>Привет, <span th:text="${username}"></span>!</div>
+    <div class="container">
+        <header class="page-header">
+            <h1>Tracks</h1>
+            <div class="greeting">
+                Hello, <span th:text="${username}"></span>!
+            </div>
+        </header>
 
-  <ul>
-    <li th:each="track : ${tracks}" th:text="${track.name}"></li>
-  </ul>
+        <div class="tracks-section">
+            <ul class="track-list" th:if="${tracks != null and !tracks.isEmpty()}">
+                <li th:each="track : ${tracks}" th:text="${track.name}"></li>
+            </ul>
+            <div class="empty-state" th:if="${tracks == null or tracks.isEmpty()}">
+                <p>While not have a tracks. To be first!</p>
+            </div>
+        </div>
 
-  <form th:action="@{/app/tracks}" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" accept="audio/*" required/>
-      <button type="submit">Загрузить</button>
-  </form>
+        <div class="upload-section">
+            <form th:action="@{/app/tracks}" method="post" enctype="multipart/form-data" class="upload-form">
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" accept="audio/*" required id="fileInput" />
+                    <label for="fileInput" class="file-label">
+                        Choose audio...
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload track</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="/" class="back-to-home">
+        <svg class="home-icon" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+        Home
+    </a>
+
+    <script th:src="@{/js/tracks.js}"></script>
 </body>
 </html>
