@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rf.mizuka.web.application.controllers.auth.UserExistException;
 import rf.mizuka.web.application.database.user.repository.UserRepository;
 import rf.mizuka.web.application.models.user.User;
 
@@ -222,9 +223,9 @@ public class UserService {
      * @throws IllegalArgumentException если пользователь с таким username уже существует
      */
     @Transactional
-    public void registerUser(String username, String rawPassword) {
+    public void registerUser(String username, String rawPassword) throws UserExistException {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("User already exists: " + username);
+            throw new UserExistException(username);
         }
 
         User user = new User();

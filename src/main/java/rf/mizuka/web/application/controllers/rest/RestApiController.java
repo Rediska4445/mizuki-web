@@ -37,6 +37,7 @@ public class RestApiController {
         Map<String, String> response = new HashMap<>();
         response.put("access_token", token);
         response.put("token_type", "Bearer");
+
         return response;
     }
 

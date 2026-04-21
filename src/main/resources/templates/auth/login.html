@@ -16,8 +16,10 @@
     </header>
 
     <!-- Ошибка входа -->
-    <div th:if="${loginError}" class="error-alert">
-      <span th:text="${loginError}"></span>
+    <div th:if="${param.error}" class="error-alert">
+      <span>
+        Incorrect entered data.
+      </span>
     </div>
 
     <!-- Форма входа -->

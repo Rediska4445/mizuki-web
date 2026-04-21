@@ -13,6 +13,11 @@
         <p class="subtitle">Manage your API credentials here.</p>
     </header>
 
+    <div th:if="${appLimitError}" class="error-alert" style="color: red; background: #fee; padding: 10px; border: 1px solid red;">
+        <h3>Create application error</h3>
+        <p th:text="${appLimitError}"></p>
+    </div>
+
     <div th:if="${newAppSecret}" class="success-alert">
         <h3>App Created Successfully!</h3>
         <p>Please copy your credentials now. You won't see the secret again.</p>

@@ -71,6 +71,6 @@ public class AuthApiServiceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Invalid credentials"));
+                .andExpect(jsonPath("$.error").value("Entity is unauthorized"));
     }
 }

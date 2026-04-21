@@ -1,7 +1,6 @@
 package rf.mizuka.web.application.controllers.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -217,7 +216,7 @@ public class AuthController {
      * </pre>
      *
      * <h3>Ручная установка SecurityContext (STATELESS режим)</h3>
-     * <p>Поскольку {@link SecurityConfig#securityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS},
+     * <p>Поскольку {@link SecurityConfig#webSecurityFilterChain(HttpSecurity)} () SessionCreationPolicy.STATELESS},
      * SecurityContext НЕ сохраняется автоматически:
      * <pre>
      * SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -259,13 +258,8 @@ public class AuthController {
             SecurityContextHolder.setContext(context);
 
             return "redirect:/";
-        } catch (BadCredentialsException e) {
-            model.addAttribute("loginError", "Invalid username or password.");
-            model.addAttribute("loginForm", loginForm);
-
-            return "auth/login";
         } catch (AuthenticationException e) {
-            model.addAttribute("loginError", "Authentication error: " + e.getMessage());
+            model.addAttribute("loginError", "Invalid entered data.");
             model.addAttribute("loginForm", loginForm);
 
             return "auth/login";
@@ -348,8 +342,8 @@ public class AuthController {
             userService.registerUser(registerForm.getUsername(), registerForm.getPassword());
 
             return "redirect:/auth/login";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("registerError", e.getMessage());
+        } catch (IllegalArgumentException | UserExistException e) {
+            model.addAttribute("registerError", "Incorrect entered data.");
 
             return "auth/register";
         }

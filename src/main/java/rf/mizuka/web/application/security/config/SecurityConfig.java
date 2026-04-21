@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -152,32 +153,33 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http)
             throws Exception
     {
         http
-                .securityMatcher(path -> !path.getRequestURI().startsWith("/api") && !path.getRequestURI().startsWith("/error"))
                 .securityContext(securityContext -> securityContext
                         .securityContextRepository(new HttpSessionSecurityContextRepository())
                         .requireExplicitSave(false)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**").denyAll()
                         .requestMatchers("/favicon.ico", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/register").permitAll()
-                        .requestMatchers("/dashboard/developers/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> new LoginUrlAuthenticationEntryPoint("/auth/login")
-                                .commence(request, response, authException))
-                        .accessDeniedHandler((request, response, accessDeniedException) -> response.sendRedirect("/auth/login"))
+                .exceptionHandling(eh -> eh
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/auth/login"))
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
-                .formLogin(AbstractHttpConfigurer::disable);
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .failureUrl("/auth/login?error")
+                        .permitAll()
+                );
 
         return http.build();
     }
@@ -188,15 +190,13 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(ss -> ss.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/token").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
         return http.build();
     }

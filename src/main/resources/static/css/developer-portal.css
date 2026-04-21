@@ -142,7 +142,7 @@ code {
 
 .form-group input:focus {
     outline: none;
-    border-color: #10b981;
+    border-color: rgb(26, 26, 26);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 

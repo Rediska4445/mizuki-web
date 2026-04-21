@@ -49,23 +49,28 @@ public class DeveloperDashboardController {
     @PostMapping("/create")
     public String createNewApp(@RequestParam String appName,
                                Principal principal,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes redirectAttributes
+    ) {
         User user = userService.findByUsername(principal.getName());
 
         String clientId = UUID.randomUUID().toString();
         String rawSecret = UUID.randomUUID().toString().replace("-", "");
 
-        Application newDev = new Application();
-        newDev.setClientId(clientId);
-        newDev.setClientSecret(passwordEncoder.encode(rawSecret));
-        newDev.setDeveloperName(appName);
-        newDev.setOwner(user);
-        newDev.setScopes(Set.of("read"));
+        if(developerRepository.findAllByOwner(user).size() < 1) {
+            Application newDev = new Application();
+            newDev.setClientId(clientId);
+            newDev.setClientSecret(passwordEncoder.encode(rawSecret));
+            newDev.setDeveloperName(appName);
+            newDev.setOwner(user);
+            newDev.setScopes(Set.of("read"));
 
-        developerRepository.save(newDev);
+            developerRepository.save(newDev);
 
-        redirectAttributes.addFlashAttribute("newAppSecret", rawSecret);
-        redirectAttributes.addFlashAttribute("newAppClientId", clientId);
+            redirectAttributes.addFlashAttribute("newAppSecret", rawSecret);
+            redirectAttributes.addFlashAttribute("newAppClientId", clientId);
+        } else {
+            redirectAttributes.addFlashAttribute("appLimitError", "You cannot create second application");
+        }
 
         return "redirect:/developers/developer-dashboard";
     }

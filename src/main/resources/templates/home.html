@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://thymeleaf.org">
 <head>
     <title>Mizuka Web</title>
     <link rel="stylesheet" href="/css/main-landing.css">
+    <link rel="stylesheet" href="/css/buttons/default.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -16,11 +17,11 @@
 
     <div class="main-buttons">
         <form th:action="@{/auth/register}" method="get" class="inline-form">
-            <button type="submit" class="btn btn-primary">Sign in</button>
+            <button type="submit" class="btn">Sign in</button>
         </form>
 
         <form th:action="@{/app/tracks}" method="get" class="inline-form">
-            <button type="submit" class="btn btn-primary">Tracks</button>
+            <button type="submit" class="btn">Tracks</button>
         </form>
     </div>
 
