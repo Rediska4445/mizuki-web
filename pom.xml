@@ -6,11 +6,11 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>rf</groupId>
 	<artifactId>mizuka</artifactId>
-	<version>1.0</version>
+	<version>1.0.3</version>
 	<name/>
 	<description/>
 	<url/>
@@ -32,7 +32,6 @@
 		<junit.jupiter.version>5.11.3</junit.jupiter.version>
 	</properties>
 	<dependencies>
-
 		<!-- Tests -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
