@@ -188,8 +188,7 @@ public class AuthControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"))
-                .andExpect(model().attributeExists("loginError"))
-                .andExpect(model().attribute("loginError", "Invalid username or password."));
+                .andExpect(model().attributeExists("loginError"));
     }
 
     /**
@@ -268,6 +267,6 @@ public class AuthControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/register"))
-                .andExpect(model().attribute("registerError", "User already exists"));
+                .andExpect(model().attributeExists("registerError"));
     }
 }

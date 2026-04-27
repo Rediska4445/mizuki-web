@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import rf.mizuka.web.application.controllers.auth.UserExistException;
 import rf.mizuka.web.application.database.user.repository.UserRepository;
 import rf.mizuka.web.application.models.user.User;
 import rf.mizuka.web.application.services.user.UserService;
@@ -200,8 +201,8 @@ public class UserServiceTest {
 
         // Шаг 5: проверка, что повторная регистрация того же username вызывает ошибку
         assertThatThrownBy(() -> userService.registerUser(username, "anotherPass"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("User already exists: " + username);
+                .isInstanceOf(UserExistException.class)
+                .hasMessage(username);
 
         // Дополнительная проверка, что пользователь всё ещё один в БД
         // (транзакция откатилась, дубль не сохранился)
