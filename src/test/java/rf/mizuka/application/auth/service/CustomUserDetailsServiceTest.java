@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @Rollback
 class CustomUserDetailsServiceTest {
-
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
@@ -32,7 +31,6 @@ class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("loadUserByUsername возвращает UserDetails для существующего пользователя")
     void shouldLoadUserDetailsForExistingUser() {
-        // GIVEN: пользователь в БД
         String username = "existinguser";
         String rawPassword = "secret123";
 
@@ -41,10 +39,8 @@ class CustomUserDetailsServiceTest {
         user.setPassword(passwordEncoder.encode(rawPassword));
         userRepository.save(user);
 
-        // WHEN: вызов loadUserByUsername
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // THEN: проверки через org.junit.jupiter.api.Assertions
         assertNotNull(userDetails);
         assertEquals(username, userDetails.getUsername());
         String encodedPassword = userDetails.getPassword();
@@ -56,11 +52,9 @@ class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("loadUserByUsername кидает UsernameNotFoundException для несуществующего пользователя")
     void shouldThrowUsernameNotFoundExceptionWhenUserNotExists() {
-        // GIVEN: пользователь точно не существует
         String username = "nonexistentuser";
         assertFalse(userRepository.existsByUsername(username));
 
-        // WHEN + THEN: проверяем исключение
         UsernameNotFoundException thrown =
                 assertThrows(UsernameNotFoundException.class, () -> {
                     userDetailsService.loadUserByUsername(username);
@@ -72,7 +66,6 @@ class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("UserDetails возвращает isEnabled = true для обычного пользователя")
     void shouldUserDetailsBeEnabled() {
-        // GIVEN: пользователь в БД
         String username = "enableduser";
         String rawPassword = "pass456";
 
@@ -81,10 +74,8 @@ class CustomUserDetailsServiceTest {
         user.setPassword(passwordEncoder.encode(rawPassword));
         userRepository.save(user);
 
-        // WHEN: загружаем UserDetails
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // THEN: проверки
         assertTrue(userDetails.isEnabled());
         assertTrue(userDetails.isAccountNonExpired());
         assertTrue(userDetails.isAccountNonLocked());

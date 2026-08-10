@@ -4,6 +4,7 @@
     <title>Developer Portal</title>
     <link rel="stylesheet" href="/css/developer-portal.css">
     <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
+    <link rel="stylesheet" th:href="@{/css/input/input-text.css}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -33,20 +34,31 @@
             <tr>
                 <th>App Name</th>
                 <th>Client ID</th>
-                <th>Secret ID</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="app : ${apps}">
                 <td th:text="${app.developerName}"></td>
                 <td><code th:text="${app.clientId}"></code></td>
-                <td>
-                    <form th:action="@{/developers/developer-dashboard/regenerate}" method="post" class="inline-form">
+
+                <td class="actions-cell">
+                    <form th:action="@{/developers/developer-dashboard/regenerate}" method="post">
                         <input type="hidden" name="appId" th:value="${app.id}">
-                        <button type="submit" class="btn btn-regenerate"
-                                onclick="return confirm('Are you sure? Old secret will stop working!')">
-                            Regenerate
-                        </button>
+                        <button type="submit" class="btn btn-small btn-regenerate"
+                                onclick="return confirm('Are you sure?')">Regenerate</button>
+                    </form>
+
+                    <form th:action="@{/developers/developer-dashboard/rename}" method="post">
+                        <input type="hidden" name="appId" th:value="${app.id}">
+                        <input type="text" name="newName" class="input-text" placeholder="New name" required>
+                        <button type="submit" class="btn btn-small btn-secondary">Rename</button>
+                    </form>
+
+                    <form th:action="@{/developers/developer-dashboard/remove}" method="post">
+                        <input type="hidden" name="appId" th:value="${app.id}">
+                        <button type="submit" class="btn btn-small btn-danger"
+                                onclick="return confirm('Delete app?')">Delete</button>
                     </form>
                 </td>
             </tr>

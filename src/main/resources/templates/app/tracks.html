@@ -5,6 +5,7 @@
     <title>Mizuka Web - Tracks</title>
     <link rel="stylesheet" th:href="@{/css/tracks.css}" />
     <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
+    <link rel="stylesheet" th:href="@{/css/input/input-text.css}" />
 </head>
 <body>
     <div class="container">
@@ -15,12 +16,27 @@
             </div>
         </header>
 
+        <div th:if="${error}" style="background: #e7f3fe; color: #0c5460; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            <p th:text="${error}"></p>
+        </div>
+
+        <form th:action="@{/app/tracks}" method="get">
+            <div class="search-from-group">
+                <input class="input-text" type="text" name="search" th:value="${searchQuery}" placeholder="Search" />
+            </div>
+        </form>
+
         <div class="tracks-section">
             <ul class="track-list" th:if="${tracks != null and !tracks.isEmpty()}">
                 <li th:each="track : ${tracks}" th:text="${track.name}"></li>
             </ul>
             <div class="empty-state" th:if="${tracks == null or tracks.isEmpty()}">
-                <p>While not have a tracks. To be first!</p>
+                <p th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                    No tracks found for "<span th:text="${searchQuery}"></span>"
+                </p>
+                <p th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                    No tracks yet. Be the first!
+                </p>
             </div>
         </div>
 
@@ -37,12 +53,26 @@
         </div>
     </div>
 
-    <a href="/" class="back-to-home">
-        <svg class="home-icon" viewBox="0 0 24 24">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
-        Home
-    </a>
+    <div class="pagination-section" th:if="${totalPages > 1}">
+        <div class="pagination">
+            <a th:href="@{/app/tracks(search=${searchQuery}, page=${currentPage - 1}, size=${pageSize})}"
+               th:classappend="${currentPage == 0} ? 'disabled' : ''"
+               class="pagination-link">← Prev</a>
+
+            <div class="pages" th:if="${totalPages <= 7}">
+                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                        <a th:href="@{/app/tracks(search=${searchQuery}, page=${i}, size=${pageSize})}"
+                           th:text="${i + 1}"
+                           th:classappend="${i == currentPage} ? 'active' : ''"
+                           class="pagination-link"></a>
+                    </span>
+            </div>
+
+            <a th:href="@{/app/tracks(search=${searchQuery}, page=${currentPage + 1}, size=${pageSize})}"
+               th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''"
+               class="pagination-link">Next →</a>
+        </div>
+    </div>
 
     <script th:src="@{/js/tracks.js}"></script>
 </body>

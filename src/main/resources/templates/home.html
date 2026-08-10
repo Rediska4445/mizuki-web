@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://thymeleaf.org">
 <head>
     <title>Mizuka Web</title>
-    <link rel="stylesheet" href="/css/main-landing.css">
-    <link rel="stylesheet" href="/css/buttons/default.css">
+    <link th:href="@{/css/main-landing.css}" rel="stylesheet">
+    <link th:href="@{/css/buttons/default.css}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -23,12 +23,6 @@
         <form th:action="@{/app/tracks}" method="get" class="inline-form">
             <button type="submit" class="btn">Tracks</button>
         </form>
-    </div>
-
-    <div sec:authorize="isAuthenticated()" class="dev-section">
-        <a th:href="@{/developers/developer-dashboard}" class="btn btn-secondary">
-            For Developers
-        </a>
     </div>
 </div>
 </body>
