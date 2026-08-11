@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
-import rf.mizuka.web.application.models.user.User;
 import rf.mizuka.web.application.models.tracks.Track;
+import rf.mizuka.web.application.services.audio.UnknownAuthorException;
+import rf.mizuka.web.application.services.audio.UnknownTitleException;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.io.IOException;
@@ -22,12 +22,11 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/app/tracks")
-public class TracksController {
-    private final TrackRepository trackRepo;
+public final class TracksController
+{
     private final TrackService trackService;
 
-    public TracksController(TrackRepository trackRepo, TrackService trackService) {
-        this.trackRepo = trackRepo;
+    public TracksController(TrackService trackService) {
         this.trackService = trackService;
     }
 
@@ -37,7 +36,8 @@ public class TracksController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model,
-            Principal principal) {
+            Principal principal
+    ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("name").descending());
 
         Page<Track> trackPage = trackService.searchTracks(search, pageable);
@@ -55,15 +55,19 @@ public class TracksController {
     }
 
     @PostMapping
-    public String upload(@RequestParam("file") MultipartFile file, RedirectAttributes redirect) {
+    public String upload(@RequestParam("file") MultipartFile file, RedirectAttributes redirect)
+            throws Exception
+    {
         if (!file.isEmpty()) {
             try {
                 Track savedTrack = trackService.saveTrack(file);
-            } catch (IOException e) {
-                return "redirect:/app/tracks";
-            }
 
-            redirect.addFlashAttribute("message", "Uploaded: " + file.getOriginalFilename());
+                redirect.addFlashAttribute("message", "Uploaded: " + savedTrack.getTitle());
+            } catch (UnknownTitleException | UnknownAuthorException e) {
+                redirect.addAttribute("error", e.getMessage());
+            } catch (IOException e) {
+                redirect.addAttribute("error", "Unknown client error");
+            }
         } else {
             redirect.addAttribute("error", "File is empty");
         }
