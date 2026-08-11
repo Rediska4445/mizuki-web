@@ -1,10 +1,14 @@
 package rf.mizuka.web.application.models.tracks;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
+@AllArgsConstructor
 @Table(name = "tracks")
 public final class Track
 {
@@ -42,19 +46,4 @@ public final class Track
     private String filePath;
 
     public Track() {}
-
-    public Track setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public Track setId(Long id) {
-        this.id = id;
-        return this;
-    }
-
-    public Track setFilePath(String filePath) {
-        this.filePath = filePath;
-        return this;
-    }
 }
