@@ -61,6 +61,14 @@ public class TrackService {
         track.setName(originalFilename);
         track.setFilePath(targetPath.toString());
 
-        return trackRepo.save(track);
+        try {
+            track = audioMetadataService.extractMetadata(track);
+
+            return trackRepo.save(track);
+        } catch (Exception e) {
+            Files.delete(targetPath);
+
+            throw e;
+        }
     }
 }
