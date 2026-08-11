@@ -12,6 +12,20 @@ public final class Track
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] picture;
+
+    @Transient
+    private String base64Picture;
+
+    public String getBase64Picture() {
+        if (this.picture != null && this.picture.length > 0) {
+            return java.util.Base64.getEncoder().encodeToString(this.picture);
+        }
+        return null;
+    }
+
     @Column(nullable = false)
     private String name;
 
