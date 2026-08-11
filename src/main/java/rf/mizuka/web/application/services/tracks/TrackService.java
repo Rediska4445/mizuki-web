@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
 import rf.mizuka.web.application.models.tracks.Track;
+import rf.mizuka.web.application.services.audio.AudioMetadataService;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,10 +20,16 @@ public class TrackService {
     @Value("${storage.uploads.tracks.location}")
     private String storageLocation;
 
-    private TrackRepository trackRepo;
+    private final AudioMetadataService audioMetadataService;
+    private final TrackRepository trackRepo;
 
-    public TrackService(TrackRepository trackRepo) {
+    public TrackService(AudioMetadataService audioMetadataService, TrackRepository trackRepo) {
+        this.audioMetadataService = audioMetadataService;
         this.trackRepo = trackRepo;
+    }
+
+    public AudioMetadataService audioMetadataService() {
+        return audioMetadataService;
     }
 
     public Page<Track> findAllTracks(Pageable pageable) {
@@ -38,9 +44,9 @@ public class TrackService {
         return trackRepo.findByNameContainingIgnoreCase(query.trim(), pageable);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public Track saveTrack(MultipartFile file)
-            throws IOException
+            throws Exception
     {
         String originalFilename = file.getOriginalFilename();
 
@@ -55,6 +61,7 @@ public class TrackService {
         if (!Files.exists(targetPath.getParent())) {
             Files.createDirectories(targetPath.getParent());
         }
+
         Files.copy(file.getInputStream(), targetPath);
 
         Track track = new Track();
