@@ -29,6 +29,15 @@ public final class Track
     @Column(nullable = false)
     private String name;
 
+    @Column(length = 128)
+    private String title;
+
+    @Column(length = 64, unique = true)
+    private String author;
+
+    @Column
+    private Short duration;
+
     @Column(unique = true)
     private String filePath;
 
