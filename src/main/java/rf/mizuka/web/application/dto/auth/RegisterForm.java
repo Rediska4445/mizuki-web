@@ -1,5 +1,8 @@
 package rf.mizuka.web.application.dto.auth;
 
+import lombok.Getter;
+
+@Getter
 public final class RegisterForm
 {
     private String username;
