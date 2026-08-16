@@ -43,8 +43,9 @@ public class TrackService {
         this.trackRepo = trackRepo;
     }
 
-    public AudioMetadataService audioMetadataService() {
-        return audioMetadataService;
+    public Page<Track> searchTracks(String query, int size)
+    {
+        return trackRepository.findByNameContaining(query, size <= 0 ? Pageable.unpaged() : Pageable.ofSize(size));
     }
 
     public Page<Track> findAllTracks(Pageable pageable) {
