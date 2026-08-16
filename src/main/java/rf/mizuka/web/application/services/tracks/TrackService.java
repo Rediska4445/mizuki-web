@@ -48,9 +48,12 @@ public class TrackService {
         return trackRepository.findByNameContaining(query, size <= 0 ? Pageable.unpaged() : Pageable.ofSize(size));
     }
 
-    public Page<Track> findAllTracks(Pageable pageable) {
-        return trackRepo.findAll(pageable);
-    }
+    public String encodeBase64Picture(Track track)
+    {
+        if (track.getPicture() != null && track.getPicture().length > 0)
+        {
+            return java.util.Base64.getEncoder().encodeToString(track.getPicture());
+        }
 
     public Page<Track> searchTracks(String query, Pageable pageable) {
         if (query == null || query.trim().isEmpty()) {
