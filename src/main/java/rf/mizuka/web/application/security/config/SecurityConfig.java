@@ -63,6 +63,14 @@ public class SecurityConfig {
                         .loginPage("/auth/login")
                         .failureUrl("/auth/login?error")
                         .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
                 );
 
         return http.build();
