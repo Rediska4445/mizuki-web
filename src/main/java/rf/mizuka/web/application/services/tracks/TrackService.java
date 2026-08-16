@@ -60,7 +60,18 @@ public class TrackService {
             return findAllTracks(pageable);
         }
 
-        return trackRepo.findByNameContainingIgnoreCase(query.trim(), pageable);
+    /**
+     * Detect color from track picture. Result must be in HEX format.
+     * @param   track
+     *          the track to extract picture and after detect color
+     * @return color in HEX format
+     * **/
+    public String getColorFromAlbumArt(Track track)
+            throws IOException
+    {
+        return "#" + Integer.toHexString(
+                colorService.findMostContrastingColor(ImageIO.read(new ByteArrayInputStream(track.getPicture())))
+                        .getRGB() & 0x00FFFFFF).toUpperCase();
     }
 
     @Transactional(rollbackOn = Exception.class)
