@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import rf.mizuka.utilities.color.Colorizier;
 import rf.mizuka.web.application.database.entities.media.authors.Author;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.database.repository.AuthorRepository;
@@ -58,11 +59,45 @@ public class TrackService
         return trackRepository.findByNameContaining(query, size <= 0 ? Pageable.unpaged() : Pageable.ofSize(size));
     }
 
+    /**
+     * Overdrive method, which return {@link #encodeBase64Picture(byte[])}
+     *
+     * @param track the track entity
+     * @return Base64 format encoded picture, or null
+     */
     public String encodeBase64Picture(Track track)
     {
-        if (track.getPicture() != null && track.getPicture().length > 0)
+        return encodeBase64Picture(track.getPicture());
+    }
+
+    /**
+     * Method for encode picture to web format.
+     * <p>
+     * Examples of behavior:
+     * <pre>{@code
+     * // 1. Standard behavior with valid data:
+     * byte[] input = new byte[] { 65, 66, 67 }; // String "ABC"
+     * encodeBase64Picture(input);
+     * // Returns: "QUJD"
+     *
+     * // 2. Handling an empty array:
+     * byte[] input = new byte[0];
+     * encodeBase64Picture(input);
+     * // Returns: null
+     *
+     * // 3. Handling a null reference:
+     * encodeBase64Picture(null);
+     * // Returns: null
+     * }</pre>
+     *
+     * @param picture byte array, which mean the picture in raw view
+     * @return Base64 format encoded picture, null, if picture null or length &lt; 0
+     */
+    public String encodeBase64Picture(byte[] picture)
+    {
+        if (picture != null && picture.length > 0)
         {
-            return java.util.Base64.getEncoder().encodeToString(track.getPicture());
+            return java.util.Base64.getEncoder().encodeToString(picture);
         }
 
         return null;
@@ -70,6 +105,25 @@ public class TrackService
 
     /**
      * Detect color from track picture. Result must be in HEX format.
+     * <p>
+     * Note: The color detection logic is non-binding and subject to change.
+     * <p>
+     * Examples of behavior:
+     * <pre>{@code
+     * // 1. When colorService detects pure Blue color:
+     * // Track contains bytes of an image where the dominant contrasting color is Blue (RGB: 0, 0, 255)
+     * findMostContrastingColor(trackWithBlueImage);
+     * // Returns: "#0000FF" (guaranteed 6 characters after '#' with leading zeros)
+     *
+     * // 2. When track has no picture bytes:
+     * track.setPicture(null);
+     * findMostContrastingColor(track);
+     * // Returns: null
+     *
+     * // 3. Handling a null track reference:
+     * findMostContrastingColor(null);
+     * // Returns: null
+     * }</pre>
      * @param   track
      *          the track to extract picture and after detect color
      * @return color in HEX format
@@ -77,9 +131,9 @@ public class TrackService
     public String getColorFromAlbumArt(Track track)
             throws IOException
     {
-        return "#" + Integer.toHexString(
+        return Colorizier.convertColorToHex(
                 colorService.findMostContrastingColor(ImageIO.read(new ByteArrayInputStream(track.getPicture())))
-                        .getRGB() & 0x00FFFFFF).toUpperCase();
+        );
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -116,11 +170,14 @@ public class TrackService
             // Check on exist metadata into track
             if(track.getTitle() != null
                     && track.getAuthors() != null
-                    && track.getDuration() != null) {
+                    && track.getDuration() != null)
+            {
                  meta = new AudioMetadataService.Metadata(
                         track.getTitle(), track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()), track.getDuration(), null
                 );
-            } else {
+            }
+            else
+            {
                 meta = audioService.audioMetadataService().extractMetadata(track);
             }
 
@@ -138,7 +195,9 @@ public class TrackService
             track.setAuthors(authors);
             track.setDuration(meta.Duration());
             track.setPicture(meta.rawImage());
-            track.setColor(getColorFromAlbumArt(track).toString());
+
+            if(track.getColor() == null)
+                track.setColor(getColorFromAlbumArt(track));
 
             return trackRepository.save(track);
         }

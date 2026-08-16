@@ -22,19 +22,20 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import rf.mizuka.web.application.database.user.repository.UserRepository;
+import rf.mizuka.web.application.database.repository.UserRepository;
 import rf.mizuka.web.application.services.user.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig
+{
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     @Qualifier("bCryptPasswordEncoder")
     private PasswordEncoder passwordEncoder;
 
+    /* Main filter chain for usually users */
     @Bean
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http)
@@ -77,9 +78,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /* Developer security chain for developers and other applications */
+    /* While don't touch */
     @Bean
     @Order(1)
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http)
+            throws Exception
+    {
         http
                 .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
@@ -95,7 +100,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
+    public AccessDeniedHandler accessDeniedHandler()
+    {
         LoginUrlAuthenticationEntryPoint entryPoint =
                 new LoginUrlAuthenticationEntryPoint("/auth/login");
 
@@ -109,13 +115,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService()
+    {
         return new CustomUserDetailsService(userRepository);
     }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(
-            UserDetailsService userDetailsService) {
+            UserDetailsService userDetailsService)
+    {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
 
@@ -124,7 +132,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            DaoAuthenticationProvider daoAuthenticationProvider) {
+            DaoAuthenticationProvider daoAuthenticationProvider)
+    {
         return new ProviderManager(daoAuthenticationProvider);
     }
 }

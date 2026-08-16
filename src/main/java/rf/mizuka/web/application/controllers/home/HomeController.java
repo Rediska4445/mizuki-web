@@ -33,7 +33,7 @@ public final class HomeController
                 e -> new TrackForm(
                         e,
                         trackService.encodeBase64Picture(e),
-                        trackService.audioService().audioMetadataService().convertDurationToString((int) e.getDuration().getSeconds())
+                        trackService.audioService().audioMetadataService().convertDurationToString(e.getDuration())
                 ));
 
         String username = principal.getName().equals("default") ? "default" : principal.getName();
