@@ -6,21 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
-import rf.mizuka.web.application.database.user.repository.UserRepository;
-import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.database.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Transactional
 @Rollback
-public class UserRepositoryTest {
+public class UserRepositoryTest
+{
     @Autowired
     private UserRepository userRepository;
 
     @Test
     @DisplayName("existsByUsername должно возвращать false для несуществующего пользователя")
-    void shouldReturnFalseForNonexistentUser() {
+    void shouldReturnFalseForNonexistentUser()
+    {
         String username = "newuser";
 
         boolean exists = userRepository.existsByUsername(username);

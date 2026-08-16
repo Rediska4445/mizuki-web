@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
-import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
-import rf.mizuka.web.application.models.tracks.Track;
+import rf.mizuka.web.application.database.entities.media.tracks.Track;
+import rf.mizuka.web.application.database.repository.TrackRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-public class TrackRepositoryTest {
+public class TrackRepositoryTest
+{
     @Autowired
     private TestEntityManager entityManager;
 
@@ -22,8 +23,10 @@ public class TrackRepositoryTest {
     private TrackRepository trackRepository;
 
     @Test
-    void shouldSaveTrackWithGeneratedId() {
-        Track newTrack = new Track().setName("Test Track - Save Test");
+    void shouldSaveTrackWithGeneratedId()
+    {
+        Track newTrack = new Track();
+        newTrack.setName("Test Track - Save Test");
 
         Track savedTrack = trackRepository.save(newTrack);
 
@@ -38,7 +41,10 @@ public class TrackRepositoryTest {
 
     @Test
     void shouldFindById() {
-        Track savedTrack = trackRepository.save(new Track().setName("Findable Track"));
+        Track tr = new Track();
+        tr.setName("Findable Track");
+
+        Track savedTrack = trackRepository.save(tr);
         Long trackId = savedTrack.getId();
 
         Optional<Track> foundTrack = trackRepository.findById(trackId);
@@ -50,7 +56,9 @@ public class TrackRepositoryTest {
 
     @Test
     void shouldUpdateExistingTrack() {
-        Track trackV1 = trackRepository.save(new Track().setName("Version 1"));
+        Track tr = new Track();
+        tr.setName("Findable Trac1k");
+        Track trackV1 = trackRepository.save(tr);
         Long trackId = trackV1.getId();
 
         trackV1.setName("Version 2");
@@ -67,7 +75,9 @@ public class TrackRepositoryTest {
 
     @Test
     void shouldDeleteById() {
-        Track trackToDelete = trackRepository.save(new Track().setName("ToDelete"));
+        Track tr = new Track();
+        tr.setName("Findable Track123");
+        Track trackToDelete = trackRepository.save(tr);
         Long trackId = trackToDelete.getId();
         assertEquals(1L, trackRepository.count(), "Сначала должна быть 1 запись");
 
@@ -85,9 +95,22 @@ public class TrackRepositoryTest {
 
     @Test
     void shouldReturnAllTracks() {
-        Track track1 = trackRepository.save(new Track().setName("Track Alpha"));
-        Track track2 = trackRepository.save(new Track().setName("Track Beta"));
-        Track track3 = trackRepository.save(new Track().setName("Track Gamma"));
+        String str = "Track1";
+        String str1 = "Track2";
+        String str2 = "Track3";
+
+        Track tr = new Track();
+        tr.setName(str);
+
+        Track tr1 = new Track();
+        tr1.setName(str1);
+
+        Track tr2 = new Track();
+        tr2.setName(str2);
+
+        Track track1 = trackRepository.save(tr);
+        Track track2 = trackRepository.save(tr1);
+        Track track3 = trackRepository.save(tr2);
 
         assertEquals(3L, trackRepository.count(), "Должно быть 3 трека перед findAll()");
 
@@ -99,7 +122,10 @@ public class TrackRepositoryTest {
         assertTrue(allTracks.contains(track3), "Третий трек должен быть в списке");
 
         assertEquals(track1.getId(), allTracks.get(0).getId(), "Первый ID должен быть 1");
-        assertEquals("Track Alpha", allTracks.get(0).getName(), "Имена должны совпадать");
+        assertEquals(str, allTracks.get(0).getName(), "Имена должны совпадать");
+        assertEquals(str1, allTracks.get(1).getName(), "Имена должны совпадать");
+        assertEquals(str2, allTracks.get(2).getName(), "Имена должны совпадать");
+
     }
 
     @Test
@@ -116,9 +142,22 @@ public class TrackRepositoryTest {
 
     @Test
     void shouldReturnCorrectCount() {
-        trackRepository.save(new Track().setName("Counted Track 1"));
-        trackRepository.save(new Track().setName("Counted Track 2"));
-        trackRepository.save(new Track().setName("Counted Track 3"));
+        String str = "Track1";
+        String str1 = "Track2";
+        String str2 = "Track3";
+
+        Track tr = new Track();
+        tr.setName(str);
+
+        Track tr1 = new Track();
+        tr1.setName(str1);
+
+        Track tr2 = new Track();
+        tr2.setName(str2);
+
+        trackRepository.save(tr);
+        trackRepository.save(tr1);
+        trackRepository.save(tr2);
 
         long trackCount = trackRepository.count();
 

@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import rf.mizuka.web.application.controllers.auth.UserExistException;
-import rf.mizuka.web.application.database.user.repository.UserRepository;
-import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.database.repository.UserRepository;
 import rf.mizuka.web.application.services.user.UserService;
 
 import java.util.Optional;
