@@ -130,4 +130,28 @@ public class TrackService {
             throw e;
         }
     }
+
+    @Transactional(rollbackOn = Exception.class)
+    public Track saveTrack(MultipartFile file)
+            throws Exception
+    {
+        return saveTrack(new Track(), file);
+    }
+
+    public boolean existsByTitleAndExactAuthors(String title, Set<Author> targetAuthors)
+    {
+        if (targetAuthors == null || targetAuthors.isEmpty())
+        {
+            return false;
+        }
+
+        return trackRepository.findTracksByTitleAndFirstAuthor(title, targetAuthors.iterator().next().getName()).stream()
+                .anyMatch(track -> track.getAuthors().stream()
+                        .map(Author::getName)
+                        .collect(Collectors.toSet()).equals(
+                                targetAuthors.stream()
+                                .map(Author::getName)
+                                .collect(Collectors.toSet())
+                        ));
+    }
 }
