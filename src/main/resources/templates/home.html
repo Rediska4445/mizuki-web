@@ -1,35 +1,105 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Mizuka Web</title>
-    <link rel="stylesheet" href="/css/main-landing.css">
-    <link rel="stylesheet" href="/css/buttons/default.css">
+    <title>Mizuki</title>
+    <link th:href="@{/css/main-landing.css}" rel="stylesheet">
+    <link th:href="@{/css/buttons/track-item-play-button.css}" rel="stylesheet">
+    <link th:href="@{/css/buttons/user-menu-button.css}" rel="stylesheet">
+    <link th:href="@{/css/tables/tracks-table.css}" rel="stylesheet">
+    <link th:href="@{/css/cells/track-item.css}" rel="stylesheet">
+    <link th:href="@{/css/forms/user-menu.css}" rel="stylesheet">
+    <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
+
+    <script th:src="@{/js/audio/crossfade-player.js}"></script>
+    <script th:src="@{/js/audio/fader.js}"></script>
+    <script th:src="@{/js/audio/player.js}"></script>
+    <script th:src="@{/js/home/home-tracks.js}" defer></script>
+    <script th:src="@{/js/user-menu.js}"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="container">
-    <header class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Mizuka Web</h1>
-            <p class="hero-subtitle">Spring Framework 4</p>
+    <main id="main-content">
+        <div class="container">
+            <header class="hero-section">
+                <div class="left-hero-section">
+                    <a href="/" class="hero-content" aria-label="On top">
+                        <h1 class="hero-title">Mizuki</h1>
+                        <p class="hero-subtitle">Ebanina Std.</p>
+                    </a>
+                </div>
+                <div class="right-hero-section">
+                    <div class="user-menu-wrapper">
+                        <button class="user-profile-bar" aria-label="Profile">
+                            <span class="user-name">You</span>
+                            <div class="user-avatar-circle">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                        </button>
+
+                        <div class="user-actions-dropdown">
+                            <form th:action="@{/app/tracks}" method="get" class="inline-form">
+                                <button type="submit" class="dropdown-action-btn secondary-action">Upload</button>
+                            </form>
+                            <form th:action="@{/auth/logout}" method="post" class="inline-form">
+                                <button type="submit" class="dropdown-action-btn primary-action">Sign out</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="tracks-list-container">
+                <ul class="tracks-list-view" th:if="${tracks != null and !tracks.isEmpty()}">
+                    <li class="track-item" th:each="trackForm : ${tracks}">
+                        <div class="track-main-content">
+                            <div class="track-cover-box">
+                                <img th:src="${trackForm.base64Picture != null && !trackForm.base64Picture.isEmpty()}
+                                     ? 'data:image/jpeg;base64,' + ${trackForm.base64Picture}
+                                     : @{'/img/logo-hd.png'}"
+                                     class="track-cover-img"
+                                     alt="Cover">
+                                <button class="track-item-player-button"
+                                        type="button"
+                                        th:data-track-id="${trackForm.track.id}">
+                                    <svg class="icon-svg-play" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd"
+                                              th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5v-7c0-.41.45-.67.8-.45l5.5 3.5c.33.21.33.7 0 .91l-5.5 3.5c-.35.22-.8-.04-.8-.46z"/>
+                                    </svg>
+                                    <svg class="icon-svg-pause" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd"
+                                              th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3 13h2V9H9v6zm4 0h2V9h-2v6z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="track-meta-info">
+                                <span class="track-title-text" th:text="${trackForm.track.title}">The greatest of the world</span>
+                                <span class="track-artist-text" th:text="${#strings.listJoin(trackForm.track.authors.![name], ', ')}">Mizuki</span>
+                            </div>
+                        </div>
+
+                        <div class="track-duration-box">
+                            <span th:text="${trackForm.stringDuration}">--:--</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="empty-state-box" th:if="${tracks == null or tracks.isEmpty()}">
+                    <p class="empty-state-text" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                        No tracks found for "<span th:text="${searchQuery}"></span>"
+                    </p>
+                    <p class="empty-state-text" th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                        No tracks yet. Be the first!
+                    </p>
+                </div>
+            </div>
         </div>
-    </header>
-
-    <div class="main-buttons">
-        <form th:action="@{/auth/register}" method="get" class="inline-form">
-            <button type="submit" class="btn">Sign in</button>
-        </form>
-
-        <form th:action="@{/app/tracks}" method="get" class="inline-form">
-            <button type="submit" class="btn">Tracks</button>
-        </form>
-    </div>
-
-    <div sec:authorize="isAuthenticated()" class="dev-section">
-        <a th:href="@{/developers/developer-dashboard}" class="btn btn-secondary">
-            For Developers
-        </a>
-    </div>
-</div>
+    </main>
+    <footer>
+        <div th:replace="~{fragments/player/global-bottom-player :: bottom-player}"></div>
+    </footer>
 </body>
 </html>

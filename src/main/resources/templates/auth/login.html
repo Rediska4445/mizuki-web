@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Mizuka - Вход</title>
+  <title>Mizuka - Sign in</title>
   <link rel="stylesheet" th:href="@{/css/auth.css}" />
   <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
 </head>
@@ -15,14 +14,12 @@
       <p>Login to your account</p>
     </header>
 
-    <!-- Ошибка входа -->
     <div th:if="${param.error}" class="error-alert">
       <span>
         Incorrect entered data.
       </span>
     </div>
 
-    <!-- Форма входа -->
     <form th:action="@{/auth/login}" th:object="${loginForm}" method="post" class="auth-form">
       <div class="input-group">
         <label for="username">Username</label>
@@ -41,12 +38,6 @@
       <hr class="separator" />
       <a th:href="@{/auth/register}" class="auth-link">Sign up</a>
     </div>
-  </div>
-
-  <div sec:authorize="isAuthenticated()" class="home-button-wrapper">
-    <a href="/" class="back-to-home">
-      Home
-    </a>
   </div>
 </div>
 </body>

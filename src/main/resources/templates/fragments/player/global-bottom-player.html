@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
+    <link th:href="@{/css/audio/player-buttons.css}" rel="stylesheet">
+    <script th:src="@{/js/audio/player.js}" defer></script>
+    <title></title>
+</head>
+<body>
+    <div th:fragment="bottom-player" class="player-wrapper-inner">
+        <div class="player-info-block">
+            <div class="player-cover-wrap">
+                <img id="now-playing-cover" th:src="@{/img/logo-hd.png}" alt="Cover">
+            </div>
+            <div class="player-content">
+                <span id="now-playing-title">Choose track</span>
+                <span id="now-playing-author">I'm boring</span>
+            </div>
+        </div>
+
+        <div class="player-controls-block">
+            <div class="control-buttons">
+                <button id="player-prev-btn" class="control-btn side-btn">
+                    <svg viewBox="0 0 16 16" fill="white" xmlns="http://w3.org">
+                        <path d="M11.5 2.5L4.5 8l7 5.5V2.5zm-8 0h-1v11h1v-11z"/>
+                    </svg>
+                </button>
+                <button id="player-play-btn" class="control-btn main-play-btn">▶</button>
+                <button id="player-next-btn" class="control-btn side-btn">
+                    <svg viewBox="0 0 16 16" fill="white" xmlns="http://w3.org">
+                        <path d="M4.5 2.5L11.5 8l-7 5.5V2.5zm8 0h1v11h-1v-11z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="timeline-container">
+                <span id="player-current-time">0:00</span>
+                <input type="range" id="player-progress" min="0" max="100" value="0">
+                <span id="player-duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="player-volume-block">
+            <svg class="volume-icon" viewBox="0 0 24 24" fill="none" xmlns="http://w3.org">
+                <path d="M12 4L6 9H2V15H6L12 20V4Z" fill="#b3b3b3" stroke="#b3b3b3" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M16.5 8.5C17.5 9.5 18 10.7 18 12C18 13.3 17.5 14.5 16.5 15.5" stroke="#b3b3b3" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input type="range" id="player-volume" min="0" max="1" step="0.01" value="1">
+        </div>
+    </div>
+</body>
+</html>

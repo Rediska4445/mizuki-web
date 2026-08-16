@@ -16,7 +16,12 @@
 ---
 8. 11.04.2026 - 11.04.2026 - Fix auth rest api (He response with 302 on errors) (✓)
 ---
-9. 19.04.2026 - 19.04.2026 - Update html forms view (✓), add JavaDocs(✓), add Tests (_) - (✓)
-10. 19.04.2026 - Make the feature of remove application on application. Make the limit to 1 possible application. (~)
-11. 19.04.2026 - Make the logging system, and place everywhere where it should the log (~)
+9. 19.04.2026 - 19.04.2026 - Update html forms view (✓), add JavaDocs(✓), add Tests (-) - (✓)
+10. 19.04.2026 - Make the feature of remove application on application. Make the limit to 1 possible application. (✓)
+11. 19.04.2026 - Make the logging system, and place everywhere where it should the log (-)
 ---
+12. 29.04.2026 - Make the upload audio in rest api (✓)
+13. 29.04.2026 - Make the search tracks, and make pagination (✓)
+14. 03.05.2026 - Make the rest for get track into Json (~)
+15. 04.05.2026 - Make the basic stream player (~)
+16. 13.08.2026 - Make the detect main note track, and set this note in svg view to default icon

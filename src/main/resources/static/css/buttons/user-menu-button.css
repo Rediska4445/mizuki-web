@@ -1,0 +1,43 @@
+.user-profile-bar {
+    display: flex;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #e0e0e0;
+    box-sizing: border-box;
+    border-radius: 20px;
+    background-color: #ffffff;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+}
+
+.user-profile-bar:hover {
+    background-color: #f8f9fa;
+}
+
+.user-avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: #333333;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.user-profile-bar.active {
+    width: 240px;
+    max-width: calc(100vw - 2rem);
+}
+
+.user-profile-bar.active .user-name {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.08s;
+}
