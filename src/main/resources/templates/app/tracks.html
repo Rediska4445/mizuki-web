@@ -2,78 +2,36 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Mizuka Web - Tracks</title>
+    <title>Your tracks</title>
     <link rel="stylesheet" th:href="@{/css/tracks.css}" />
-    <link rel="stylesheet" th:href="@{/css/buttons/back-to-home.css}" />
     <link rel="stylesheet" th:href="@{/css/input/input-text.css}" />
-</head>
-<body>
-    <div class="container">
-        <header class="page-header">
-            <h1>Tracks</h1>
-            <div class="greeting">
-                Hello, <span th:text="${username}"></span>!
-            </div>
-        </header>
-
-        <div th:if="${error}" style="background: #e7f3fe; color: #0c5460; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-            <p th:text="${error}"></p>
-        </div>
-
-        <form th:action="@{/app/tracks}" method="get">
-            <div class="search-from-group">
-                <input class="input-text" type="text" name="search" th:value="${searchQuery}" placeholder="Search" />
-            </div>
-        </form>
-
-        <div class="tracks-section">
-            <ul class="track-list" th:if="${tracks != null and !tracks.isEmpty()}">
-                <li th:each="track : ${tracks}" th:text="${track.name}"></li>
-            </ul>
-            <div class="empty-state" th:if="${tracks == null or tracks.isEmpty()}">
-                <p th:if="${searchQuery != null and !searchQuery.isEmpty()}">
-                    No tracks found for "<span th:text="${searchQuery}"></span>"
-                </p>
-                <p th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
-                    No tracks yet. Be the first!
-                </p>
-            </div>
-        </div>
-
-        <div class="upload-section">
-            <form th:action="@{/app/tracks}" method="post" enctype="multipart/form-data" class="upload-form">
-                <div class="file-input-wrapper">
-                    <input type="file" name="file" accept="audio/*" required id="fileInput" />
-                    <label for="fileInput" class="file-label">
-                        Choose audio...
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">Upload track</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="pagination-section" th:if="${totalPages > 1}">
-        <div class="pagination">
-            <a th:href="@{/app/tracks(search=${searchQuery}, page=${currentPage - 1}, size=${pageSize})}"
-               th:classappend="${currentPage == 0} ? 'disabled' : ''"
-               class="pagination-link">← Prev</a>
-
-            <div class="pages" th:if="${totalPages <= 7}">
-                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                        <a th:href="@{/app/tracks(search=${searchQuery}, page=${i}, size=${pageSize})}"
-                           th:text="${i + 1}"
-                           th:classappend="${i == currentPage} ? 'active' : ''"
-                           class="pagination-link"></a>
-                    </span>
-            </div>
-
-            <a th:href="@{/app/tracks(search=${searchQuery}, page=${currentPage + 1}, size=${pageSize})}"
-               th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''"
-               class="pagination-link">Next →</a>
-        </div>
-    </div>
 
     <script th:src="@{/js/tracks.js}"></script>
+</head>
+<body>
+    <main id="main-content">
+        <script>window.BottomPlayer.init();</script>
+
+        <div class="container">
+            <header class="page-header">
+                <h1>Tracks</h1>
+                <div class="greeting">
+                    Hello, <span th:text="${username}"></span>!
+                </div>
+            </header>
+
+            <div class="upload-section">
+                <form th:action="@{/app/tracks}" method="post" enctype="multipart/form-data" class="upload-form">
+                    <div class="file-input-wrapper">
+                        <input type="file" name="file" accept="audio/*" required id="fileInput" />
+                        <label for="fileInput" class="file-label">
+                            Choose audio...
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload track</button>
+                </form>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
