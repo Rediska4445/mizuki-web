@@ -6,17 +6,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import rf.mizuka.web.application.database.tracks.repository.TrackRepository;
-import rf.mizuka.web.application.models.tracks.Track;
+import rf.mizuka.web.application.database.entities.media.authors.Author;
+import rf.mizuka.web.application.database.entities.media.tracks.Track;
+import rf.mizuka.web.application.database.repository.AuthorRepository;
+import rf.mizuka.web.application.database.repository.TrackRepository;
 import rf.mizuka.web.application.services.audio.AudioMetadataService;
+import rf.mizuka.web.application.services.audio.AudioService;
+import rf.mizuka.web.application.services.color.ColorService;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
-public class TrackService {
+public class TrackService
+{
     @Value("${storage.uploads.tracks.location}")
     private String storageLocation;
 
@@ -38,9 +49,8 @@ public class TrackService {
         return audioService;
     }
 
-    public TrackService(AudioMetadataService audioMetadataService, TrackRepository trackRepo) {
-        this.audioMetadataService = audioMetadataService;
-        this.trackRepo = trackRepo;
+    public TrackRepository trackRepository() {
+        return trackRepository;
     }
 
     public Page<Track> searchTracks(String query, int size)
@@ -55,10 +65,8 @@ public class TrackService {
             return java.util.Base64.getEncoder().encodeToString(track.getPicture());
         }
 
-    public Page<Track> searchTracks(String query, Pageable pageable) {
-        if (query == null || query.trim().isEmpty()) {
-            return findAllTracks(pageable);
-        }
+        return null;
+    }
 
     /**
      * Detect color from track picture. Result must be in HEX format.
@@ -75,28 +83,31 @@ public class TrackService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public Track saveTrack(MultipartFile file)
+    public Track saveTrack(Track track, MultipartFile file)
             throws Exception
     {
         String originalFilename = file.getOriginalFilename();
 
         String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
+        if (originalFilename != null && originalFilename.contains("."))
+        {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
         String technicalName = UUID.randomUUID() + extension;
         Path targetPath = Paths.get(storageLocation).resolve(technicalName);
 
-        if (!Files.exists(targetPath.getParent())) {
+        if (Files.notExists(targetPath.getParent()))
+        {
             Files.createDirectories(targetPath.getParent());
         }
 
         Files.copy(file.getInputStream(), targetPath);
 
-        Track track = new Track();
-        track.setName(originalFilename);
-        track.setFilePath(targetPath.toString());
+        if(track.getName() == null)
+            track.setName(originalFilename);
+        if(track.getFilePath() == null)
+            track.setFilePath(targetPath.toString());
 
         try
         {
@@ -123,9 +134,17 @@ public class TrackService {
                 throw new TrackAlreadyExist("Track by these authors must be unique!");
             }
 
-            return trackRepo.save(track);
-        } catch (Exception e) {
-            Files.delete(targetPath);
+            track.setTitle(meta.title());
+            track.setAuthors(authors);
+            track.setDuration(meta.Duration());
+            track.setPicture(meta.rawImage());
+            track.setColor(getColorFromAlbumArt(track).toString());
+
+            return trackRepository.save(track);
+        }
+        catch (Exception e)
+        {
+            Files.deleteIfExists(targetPath);
 
             throw e;
         }
