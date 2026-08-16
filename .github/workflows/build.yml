@@ -20,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Test with Maven
-        run: mvn clean test -B -Dmaven.wagon.http.ssl.insecure=true
+        run: mvn clean test -B
 
   build:
     runs-on: windows-latest
