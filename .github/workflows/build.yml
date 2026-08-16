@@ -36,4 +36,4 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests -B -Dhttps.protocols=TLSv1.2,TLSv1.3 -Dmaven.wagon.http.ssl.insecure=true
+        run: mvn clean package -DskipTests -B
