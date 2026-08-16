@@ -5,20 +5,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rf.mizuka.web.application.controllers.auth.UserExistException;
-import rf.mizuka.web.application.database.user.repository.UserRepository;
-import rf.mizuka.web.application.models.user.User;
+import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.database.repository.UserRepository;
 
 @Service
-public class UserService {
+public class UserService
+{
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void registerUser(String username, String rawPassword) throws UserExistException {
-        if (userRepository.existsByUsername(username)) {
+    public void registerUser(String username, String rawPassword)
+            throws UserExistException
+    {
+        if (userRepository.existsByUsername(username))
+        {
             throw new UserExistException(username);
         }
 
@@ -29,7 +32,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findByUsername(String username) {
+    public User findByUsername(String username)
+    {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
