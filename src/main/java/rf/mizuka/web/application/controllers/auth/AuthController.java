@@ -11,8 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import rf.mizuka.web.application.services.user.UserService;
-import rf.mizuka.web.application.dto.auth.LoginForm;
-import rf.mizuka.web.application.dto.auth.RegisterForm;
+import rf.mizuka.web.application.forms.auth.LoginForm;
+import rf.mizuka.web.application.forms.auth.RegisterForm;
 
 @Controller
 @RequestMapping("/auth")
@@ -25,14 +25,16 @@ public final class AuthController
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/login")
-    public String auth(Model model) {
+    public String auth(Model model)
+    {
         model.addAttribute("loginForm", new LoginForm());
 
         return "auth/login";
     }
 
     @GetMapping("/register")
-    public String registerForm(Model model) {
+    public String registerForm(Model model)
+    {
         model.addAttribute("registerForm", new RegisterForm());
 
         return "auth/register";
@@ -43,7 +45,8 @@ public final class AuthController
             @ModelAttribute("loginForm") LoginForm loginForm,
             Model model
     ) {
-        try {
+        try
+        {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword())
             );
@@ -53,7 +56,9 @@ public final class AuthController
             SecurityContextHolder.setContext(context);
 
             return "redirect:/";
-        } catch (AuthenticationException e) {
+        }
+        catch (AuthenticationException e)
+        {
             model.addAttribute("loginError", "Invalid entered data.");
             model.addAttribute("loginForm", loginForm);
 
@@ -66,8 +71,10 @@ public final class AuthController
             @ModelAttribute("registerForm") RegisterForm registerForm,
             Model model
     ) {
-        try {
-            if (!registerForm.getPassword().equals(registerForm.getConfirmPassword())) {
+        try
+        {
+            if (!registerForm.getPassword().equals(registerForm.getConfirmPassword()))
+            {
                 model.addAttribute("registerError", "Passwords do not match.");
                 return "auth/register";
             }
@@ -75,7 +82,9 @@ public final class AuthController
             userService.registerUser(registerForm.getUsername(), registerForm.getPassword());
 
             return "redirect:/auth/login";
-        } catch (IllegalArgumentException | UserExistException e) {
+        }
+        catch (IllegalArgumentException | UserExistException e)
+        {
             model.addAttribute("registerError", "Incorrect entered data.");
 
             return "auth/register";
