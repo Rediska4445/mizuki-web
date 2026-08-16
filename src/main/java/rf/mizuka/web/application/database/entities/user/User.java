@@ -1,11 +1,10 @@
-package rf.mizuka.web.application.models.user;
+package rf.mizuka.web.application.database.entities.user;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import rf.mizuka.web.application.services.user.CustomUserDetailsService;
-import rf.mizuka.web.application.services.user.UserService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,9 +14,10 @@ import java.util.Collections;
 public class User
     implements UserDetails
 {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -27,61 +27,68 @@ public class User
 
     public User() {}
 
-    public User(String username, String password) {
+    public User(String username, String password)
+    {
         this.username = username;
         this.password = password;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public User setId(long id) {
+    public User setId(long id)
+    {
         this.id = id;
         return this;
     }
 
     @Override
-    public String getUsername() {
+    public String getUsername()
+    {
         return username;
     }
 
     @Override
-    public String getPassword() {
+    public String getPassword()
+    {
         return password;
     }
 
     @Override
-    public boolean isAccountNonExpired() {
+    public boolean isAccountNonExpired()
+    {
         return true;
     }
 
     @Override
-    public boolean isAccountNonLocked() {
+    public boolean isAccountNonLocked()
+    {
         return true;
     }
 
     @Override
-    public boolean isCredentialsNonExpired() {
+    public boolean isCredentialsNonExpired()
+    {
         return true;
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return true;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    public User setUsername(String username) {
+    public User setUsername(String username)
+    {
         this.username = username;
         return this;
     }
 
-    public User setPassword(String password) {
+    public User setPassword(String password)
+    {
         this.password = password;
         return this;
     }
