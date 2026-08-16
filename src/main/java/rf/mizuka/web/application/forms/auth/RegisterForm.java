@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.dto.auth;
+package rf.mizuka.web.application.forms.auth;
 
 import lombok.Getter;
 
@@ -11,41 +11,34 @@ public final class RegisterForm
 
     public RegisterForm() {}
 
-    public RegisterForm(String username, String password) {
+    public RegisterForm(String username, String password)
+    {
         this.username = username;
         this.password = password;
         this.confirmPassword = password;
     }
 
-    public RegisterForm(String username, String password, String confirmPassword) {
+    public RegisterForm(String username, String password, String confirmPassword)
+    {
         this.username = username;
         this.password = password;
         this.confirmPassword = confirmPassword;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public RegisterForm setUsername(String username) {
+    public RegisterForm setUsername(String username)
+    {
         this.username = username;
         return this;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public RegisterForm setPassword(String password) {
+    public RegisterForm setPassword(String password)
+    {
         this.password = password;
         return this;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public RegisterForm setConfirmPassword(String confirmPassword) {
+    public RegisterForm setConfirmPassword(String confirmPassword)
+    {
         this.confirmPassword = confirmPassword;
         return this;
     }
