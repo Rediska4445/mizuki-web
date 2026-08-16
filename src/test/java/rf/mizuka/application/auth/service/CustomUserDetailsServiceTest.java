@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import rf.mizuka.web.application.database.entities.user.User;
 import rf.mizuka.web.application.database.repository.UserRepository;
 import rf.mizuka.web.application.services.user.CustomUserDetailsService;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @Rollback
+@TestPropertySource(locations = "classpath:settings-test.properties")
 class CustomUserDetailsServiceTest {
     @Autowired
     private CustomUserDetailsService userDetailsService;

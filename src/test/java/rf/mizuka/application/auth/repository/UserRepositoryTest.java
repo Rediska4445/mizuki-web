@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import rf.mizuka.web.application.database.entities.user.User;
 import rf.mizuka.web.application.database.repository.UserRepository;
 
@@ -14,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @Transactional
 @Rollback
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = "classpath:settings-test.properties")
 public class UserRepositoryTest
 {
     @Autowired

@@ -8,12 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
-import rf.mizuka.utilities.color.Colorizier;
 import rf.mizuka.web.application.database.entities.media.authors.Author;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.database.repository.TrackRepository;
@@ -29,6 +29,8 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = "classpath:settings-test.properties")
 @SpringBootTest
 @Transactional
 @Rollback
@@ -53,6 +55,15 @@ public class TrackServiceTest
                 .isEqualTo(expectedBase64);
     }
 
+    private static String convertColorToHex(java.awt.Color color)
+    {
+        int rgbWithoutAlpha = color.getRGB() & 0x00FFFFFF;
+        String hexString = Integer.toHexString(rgbWithoutAlpha).toUpperCase();
+        String paddedHex = String.format("%6s", hexString).replace(' ', '0');
+
+        return "#" + paddedHex;
+    }
+
     @Test
     void saveTrack_ShouldSaveToDatabaseAndThenRollback()
             throws Exception
@@ -62,13 +73,13 @@ public class TrackServiceTest
         track.setTitle("Track");
         track.setAuthors(new HashSet<>(Set.of(new Author("test"))));
         track.setDuration(Duration.ofSeconds(100));
-        track.setPicture("Hello".getBytes());
-        track.setColor(Colorizier.convertColorToHex(Color.WHITE));
+        track.setPicturePath("Hello");
+        track.setColor(convertColorToHex(Color.WHITE));
 
         MultipartFile mockFile = new MockMultipartFile(
                 "file",
-                "test-picture.png",
-                "image/png",
+                "test-picture.mp3",
+                "audio/mpeg",
                 "FakeImageContent".getBytes()
         );
 

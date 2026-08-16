@@ -1,6 +1,5 @@
 package rf.mizuka.web.application.services.color;
 
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -9,6 +8,15 @@ import java.awt.image.BufferedImage;
 @Service
 public class ColorService
 {
+    public String convertColorToHex(java.awt.Color color)
+    {
+        int rgbWithoutAlpha = color.getRGB() & 0x00FFFFFF;
+        String hexString = Integer.toHexString(rgbWithoutAlpha).toUpperCase();
+        String paddedHex = String.format("%6s", hexString).replace(' ', '0');
+
+        return "#" + paddedHex;
+    }
+
     public Color findMostContrastingColor(BufferedImage image0)
     {
         try {

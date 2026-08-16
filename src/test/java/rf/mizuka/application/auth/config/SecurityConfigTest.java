@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import rf.mizuka.web.application.database.repository.UserRepository;
@@ -25,7 +26,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
-public class SecurityConfigTest {
+@TestPropertySource(locations = "classpath:settings-test.properties")
+public class SecurityConfigTest
+{
     @Autowired
     private MockMvc mockMvc;
 
@@ -59,7 +62,9 @@ public class SecurityConfigTest {
 
     @Test
     @DisplayName("3. CSRF защита пропускает запрос с токеном")
-    void shouldAllowPostRequestWithCsrfOnWeb() throws Exception {
+    void shouldAllowPostRequestWithCsrfOnWeb()
+            throws Exception
+    {
         mockMvc.perform(post("/auth/register")
                         .with(csrf())
                         .param("username", "test")
