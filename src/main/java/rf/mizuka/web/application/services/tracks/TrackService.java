@@ -98,8 +98,30 @@ public class TrackService {
         track.setName(originalFilename);
         track.setFilePath(targetPath.toString());
 
-        try {
-            track = audioMetadataService.extractMetadata(track);
+        try
+        {
+            AudioMetadataService.Metadata meta;
+
+            // Check on exist metadata into track
+            if(track.getTitle() != null
+                    && track.getAuthors() != null
+                    && track.getDuration() != null) {
+                 meta = new AudioMetadataService.Metadata(
+                        track.getTitle(), track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()), track.getDuration(), null
+                );
+            } else {
+                meta = audioService.audioMetadataService().extractMetadata(track);
+            }
+
+            // Immediately call before check on exist.
+            Set<Author> authors = meta.authors().stream()
+                    .map(authorRepository::buildOrGet)
+                    .collect(Collectors.toSet());
+
+            if (existsByTitleAndExactAuthors(meta.title(), authors))
+            {
+                throw new TrackAlreadyExist("Track by these authors must be unique!");
+            }
 
             return trackRepo.save(track);
         } catch (Exception e) {
