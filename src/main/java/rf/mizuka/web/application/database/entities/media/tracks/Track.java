@@ -20,9 +20,8 @@ public class Track
     private Long id;
 
     /* Metadata */
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] picture;
+    @Column(length = 256)
+    private String picturePath;
 
     @Column(length = 7)
     private String color;
@@ -40,7 +39,7 @@ public class Track
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 256)
     private String filePath;
 
     public Track() {}

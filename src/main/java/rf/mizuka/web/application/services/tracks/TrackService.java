@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import rf.mizuka.utilities.color.Colorizier;
 import rf.mizuka.web.application.database.entities.media.authors.Author;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.database.repository.AuthorRepository;
@@ -14,6 +13,7 @@ import rf.mizuka.web.application.database.repository.TrackRepository;
 import rf.mizuka.web.application.services.audio.AudioMetadataService;
 import rf.mizuka.web.application.services.audio.AudioService;
 import rf.mizuka.web.application.services.color.ColorService;
+import rf.mizuka.web.application.services.image.ImageService;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,16 +29,23 @@ import java.util.stream.Collectors;
 @Service
 public class TrackService
 {
-    @Value("${storage.uploads.tracks.location}")
+    /* Data paths */
+    @Value(
+            "${storage.uploads.tracks.location}"
+    )
     private String storageLocation;
 
+    /* Dependency */
+    private final ImageService imageService;
     private final AudioService audioService;
     private final TrackRepository trackRepository;
     private final AuthorRepository authorRepository;
     private final ColorService colorService;
 
-    public TrackService(AudioService audioService, TrackRepository trackRepository, AuthorRepository authorRepository, ColorService colorService)
-    {
+    public TrackService(
+            ImageService imageService, AudioService audioService, TrackRepository trackRepository, AuthorRepository authorRepository, ColorService colorService
+    ) {
+        this.imageService = imageService;
         this.audioService = audioService;
         this.trackRepository = trackRepository;
         this.authorRepository = authorRepository;
@@ -50,7 +57,8 @@ public class TrackService
         return audioService;
     }
 
-    public TrackRepository trackRepository() {
+    public TrackRepository trackRepository()
+    {
         return trackRepository;
     }
 
@@ -67,7 +75,9 @@ public class TrackService
      */
     public String encodeBase64Picture(Track track)
     {
-        return encodeBase64Picture(track.getPicture());
+        return encodeBase64Picture(
+                imageService.getPictureBytes(track.getPicturePath())
+        );
     }
 
     /**
@@ -131,8 +141,8 @@ public class TrackService
     public String getColorFromAlbumArt(Track track)
             throws IOException
     {
-        return Colorizier.convertColorToHex(
-                colorService.findMostContrastingColor(ImageIO.read(new ByteArrayInputStream(track.getPicture())))
+        return colorService.convertColorToHex(
+                colorService.findMostContrastingColor(ImageIO.read(new ByteArrayInputStream(imageService.getPictureBytes(track.getPicturePath()))))
         );
     }
 
@@ -173,7 +183,10 @@ public class TrackService
                     && track.getDuration() != null)
             {
                  meta = new AudioMetadataService.Metadata(
-                        track.getTitle(), track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()), track.getDuration(), null
+                        track.getTitle(),
+                         track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()),
+                         track.getDuration(),
+                         imageService.getDefaultMusicImage()
                 );
             }
             else
@@ -194,7 +207,9 @@ public class TrackService
             track.setTitle(meta.title());
             track.setAuthors(authors);
             track.setDuration(meta.Duration());
-            track.setPicture(meta.rawImage());
+            track.setPicturePath(
+                    imageService.savePicture(meta.rawImage(), track.getName()).toFile().getAbsolutePath()
+            );
 
             if(track.getColor() == null)
                 track.setColor(getColorFromAlbumArt(track));
