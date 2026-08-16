@@ -24,3 +24,4 @@
 13. 29.04.2026 - Make the search tracks, and make pagination (✓)
 14. 03.05.2026 - Make the rest for get track into Json (~)
 15. 04.05.2026 - Make the basic stream player (~)
+16. 13.08.2026 - Make the detect main note track, and set this note in svg view to default icon
