@@ -20,8 +20,23 @@ public class TrackService {
     @Value("${storage.uploads.tracks.location}")
     private String storageLocation;
 
-    private final AudioMetadataService audioMetadataService;
-    private final TrackRepository trackRepo;
+    private final AudioService audioService;
+    private final TrackRepository trackRepository;
+    private final AuthorRepository authorRepository;
+    private final ColorService colorService;
+
+    public TrackService(AudioService audioService, TrackRepository trackRepository, AuthorRepository authorRepository, ColorService colorService)
+    {
+        this.audioService = audioService;
+        this.trackRepository = trackRepository;
+        this.authorRepository = authorRepository;
+        this.colorService = colorService;
+    }
+
+    public AudioService audioService()
+    {
+        return audioService;
+    }
 
     public TrackService(AudioMetadataService audioMetadataService, TrackRepository trackRepo) {
         this.audioMetadataService = audioMetadataService;
