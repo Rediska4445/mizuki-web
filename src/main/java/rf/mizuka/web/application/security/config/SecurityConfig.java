@@ -47,8 +47,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/**").denyAll()
-                        .requestMatchers("/favicon.ico", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/favicon.ico", "/css/**", "/js/**", "/icons/**").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register").permitAll().
+                        requestMatchers("/track/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(eh -> eh
