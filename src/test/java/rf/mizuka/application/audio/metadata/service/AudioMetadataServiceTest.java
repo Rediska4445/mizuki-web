@@ -9,15 +9,12 @@ import org.junit.jupiter.api.NamedExecutable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
-import rf.mizuka.web.application.services.audio.AudioMetadataService;
+import rf.mizuka.web.application.services.audio.metadata.AudioMetadataService;
 import rf.mizuka.web.application.services.audio.UnknownAuthorException;
 import rf.mizuka.web.application.services.audio.UnknownTitleException;
+import rf.mizuka.web.application.services.audio.metadata.IAudioMetadata;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,11 +63,9 @@ public class AudioMetadataServiceTest
 
     @Test
     public void extractMetadata_ShouldWork()
-            throws IOException,
-            UnknownTitleException, CannotReadException, TagException,
-            UnknownAuthorException, InvalidAudioFrameException,  ReadOnlyFileException
+            throws Exception
     {
-        AudioMetadataService.Metadata metadata = audioMetadataService.extractMetadata(validTrack);
+        IAudioMetadata.Metadata metadata = audioMetadataService.extractMetadata(validTrack);
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.title())

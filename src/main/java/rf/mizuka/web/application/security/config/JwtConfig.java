@@ -14,24 +14,32 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import rf.mizuka.web.application.security.managers.KeyManager;
 
 @Configuration
-public class JwtConfig {
+public class JwtConfig
+{
     private final KeyManager keyManager;
 
-    public JwtConfig(KeyManager keyManager) {
+    public JwtConfig(KeyManager keyManager)
+    {
         this.keyManager = keyManager;
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() throws Exception {
+    public JwtDecoder jwtDecoder()
+            throws Exception
+    {
         return NimbusJwtDecoder.withPublicKey(keyManager.getPublicKey()).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() throws Exception {
-        JWK jwk = new RSAKey.Builder(keyManager.getPublicKey())
-                .privateKey(keyManager.getPrivateKey())
-                .build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
+    public JwtEncoder jwtEncoder()
+            throws Exception
+    {
+        return new NimbusJwtEncoder(
+                new ImmutableJWKSet<>(new JWKSet(
+                        new RSAKey.Builder(keyManager.getPublicKey())
+                                .privateKey(keyManager.getPrivateKey())
+                                .build()
+                ))
+        );
     }
 }

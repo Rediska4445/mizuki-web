@@ -58,14 +58,20 @@ public final class TracksController
         {
             try
             {
-                redirect.addFlashAttribute("message", "Uploaded: " + trackService.saveTrack(file).getTitle());
+                redirect.addFlashAttribute("message", "Uploaded: "
+                        + trackService.saveTrack(file).getTitle()
+                );
             }
             catch (TrackAlreadyExist | UnknownTitleException | UnknownAuthorException e)
             {
+                e.printStackTrace();
+
                 redirect.addAttribute("error", e.getMessage());
             }
             catch (IOException e)
             {
+                e.printStackTrace();
+
                 redirect.addAttribute("error", "Unknown client error");
             }
         }

@@ -4,6 +4,7 @@ import rf.mizuka.web.application.database.entities.media.tracks.Track;
 
 public record TrackForm(
         Track track,
-        String base64Picture,
+        String trackUrl,
+        String pictureUrl,
         String stringDuration
 ) { }

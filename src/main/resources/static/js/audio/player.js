@@ -229,7 +229,7 @@ window.BottomPlayer =
 
                 if (titleElement) titleElement.textContent = track.title || "Без названия";
                 if (authorElement) authorElement.textContent = track.author || "Неизвестен";
-                if (coverElement && track.cover) coverElement.src = track.cover;
+                if (coverElement && track.picturePath) coverElement.src = track.picturePath;
                 if (durationSpan) durationSpan.textContent = "--:--";
 
                 this.currentTrackColor = track.color || "#ffffff";
@@ -238,7 +238,7 @@ window.BottomPlayer =
                     progressInput.style.background = `linear-gradient(to right, ${this.currentTrackColor} 0%, #4d4d4d 0%)`;
                 }
 
-                this.audio.src = `/track/stream/${trackId}`;
+                this.audio.src = track.trackPath;
                 this.audio.play().catch(err => console.error(err));
             })
             .catch(err => {

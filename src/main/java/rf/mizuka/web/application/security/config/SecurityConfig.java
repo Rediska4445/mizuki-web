@@ -29,9 +29,9 @@ import rf.mizuka.web.application.services.user.CustomUserDetailsService;
 @EnableWebSecurity
 public class SecurityConfig
 {
-    @Autowired
+    @Autowired // <-- Legacy code
     private UserRepository userRepository;
-    @Autowired
+    @Autowired // <-- Legacy code
     @Qualifier("bCryptPasswordEncoder")
     private PasswordEncoder passwordEncoder;
 

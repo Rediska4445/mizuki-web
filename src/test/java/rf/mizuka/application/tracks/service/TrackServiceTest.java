@@ -42,19 +42,6 @@ public class TrackServiceTest
     @Autowired
     private TrackRepository trackRepository;
 
-    @Test
-    public void encode64ShouldBeReturnString()
-    {
-        byte[] inputBytes = "Spring".getBytes();
-        String expectedBase64 = "U3ByaW5n";
-
-        String result = trackService.encodeBase64Picture(inputBytes);
-
-        assertThat(result)
-                .isNotNull()
-                .isEqualTo(expectedBase64);
-    }
-
     private static String convertColorToHex(java.awt.Color color)
     {
         int rgbWithoutAlpha = color.getRGB() & 0x00FFFFFF;

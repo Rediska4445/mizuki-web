@@ -10,6 +10,7 @@ public interface AuthorRepository
 {
     Optional<Author> findByName(String name);
 
+    // PUT logic for authors
     default Author buildOrGet(String name) {
         return findByName(name)
                 .orElseGet(() -> save(new Author(name)));

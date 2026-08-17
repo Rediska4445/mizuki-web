@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import rf.mizuka.web.application.forms.home.TrackForm;
+import rf.mizuka.web.application.services.storage.StorageService;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.security.Principal;
@@ -15,10 +16,12 @@ import java.security.Principal;
 @RequestMapping("/")
 public final class HomeController
 {
+    private final StorageService storageService;
     private final TrackService trackService;
 
-    public HomeController(TrackService trackService)
+    public HomeController(StorageService storageService, TrackService trackService)
     {
+        this.storageService = storageService;
         this.trackService = trackService;
     }
 
@@ -32,7 +35,8 @@ public final class HomeController
         Page<TrackForm> tracks = trackService.searchTracks(query, size).map(
                 e -> new TrackForm(
                         e,
-                        trackService.encodeBase64Picture(e),
+                        storageService.getTrackPresignedUrl(e.getFilePath()),
+                        storageService.getTrackPictureUrl(e.getPicturePath()),
                         trackService.audioService().audioMetadataService().convertDurationToString(e.getDuration())
                 ));
 

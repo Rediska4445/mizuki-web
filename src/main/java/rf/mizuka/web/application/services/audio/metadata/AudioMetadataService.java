@@ -1,23 +1,12 @@
-package rf.mizuka.web.application.services.audio;
+package rf.mizuka.web.application.services.audio.metadata;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.images.Artwork;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
+import rf.mizuka.web.application.services.audio.metadata.impl.DefaultAudioMetadataImpl;
+import rf.mizuka.web.application.services.file.FileService;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public final class AudioMetadataService
@@ -28,10 +17,16 @@ public final class AudioMetadataService
     public static final String UNDEFINED_DURATION_PRESENT
             = "--:--";
 
-    /* DTO for transferred outta "extractMetadata" method */
-    public record Metadata(
-            String title, Set<String> authors, Duration Duration, byte[] rawImage
-    ) {}
+    // Default IAudioMetadata implementation for extract metadata
+    private final IAudioMetadata iAudioMetadata
+            = new DefaultAudioMetadataImpl();
+
+    private final FileService fileService;
+
+    public AudioMetadataService(FileService fileService)
+    {
+        this.fileService = fileService;
+    }
 
     /**
      * Converts a track duration into a human-readable string format.
@@ -98,46 +93,33 @@ public final class AudioMetadataService
         }
     }
 
-    public Metadata extractMetadata(final Track tr)
-            throws IOException,
-                CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException,
-                UnknownTitleException, UnknownAuthorException
+    // Only for tests
+    public IAudioMetadata.Metadata extractMetadata(Track tr)
+            throws Exception
     {
-        File file = new File(tr.getFilePath());
-        AudioFile audioFile = AudioFileIO.read(file);
-        Tag tag = audioFile.getTag();
+        // File already exist
+        return extractMetadata(new IAudioMetadata.AudioMetadataFile(tr.getFilePath(), null));
+    }
 
-        String title = tag.getFirst(FieldKey.TITLE);
-        if (title == null || title.isEmpty())
-        {
-            throw new UnknownTitleException("Unknown title");
-        }
-
-        String authors = tag.getFirst(FieldKey.ARTIST);
-        if (authors == null || authors.isEmpty())
-        {
-            throw new UnknownAuthorException("Unknown authors");
-        }
-
-        int duration = audioFile.getAudioHeader().getTrackLength();
-        if (duration <= 0)
-        {
-            throw new InvalidAudioDurationException("Duration must be positive");
-        }
-
-        byte[] rawImageData = null;
-
-        Artwork artwork = tag.getFirstArtwork();
-        if (artwork != null)
-        {
-            rawImageData = artwork.getBinaryData();
-        }
-
-        return new Metadata(
-                title,
-                new HashSet<>(Arrays.stream(authors.split(",")).toList()),
-                Duration.ofSeconds(duration),
-                rawImageData
+    public IAudioMetadata.Metadata extractMetadata(MultipartFile tr)
+            throws Exception
+    {
+        // Need to create file from MultipartFile
+        return fileService.createTempFile("track-upload-", fileService.extractExtension(tr.getOriginalFilename()),
+                tr,
+                e -> {
+                    try {
+                        return extractMetadata(new IAudioMetadata.AudioMetadataFile(e.toFile().getAbsolutePath(), tr));
+                    } catch (Exception ex) {
+                        throw ex;
+                    }
+                }
         );
+    }
+
+    public IAudioMetadata.Metadata extractMetadata(IAudioMetadata.AudioMetadataFile tr)
+            throws Exception
+    {
+        return iAudioMetadata.extractMetadata(tr);
     }
 }

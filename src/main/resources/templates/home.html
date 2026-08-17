@@ -56,13 +56,14 @@
                     <li class="track-item" th:each="trackForm : ${tracks}">
                         <div class="track-main-content">
                             <div class="track-cover-box">
-                                <img th:src="${trackForm.base64Picture != null && !trackForm.base64Picture.isEmpty()}
-                                     ? 'data:image/jpeg;base64,' + ${trackForm.base64Picture}
-                                     : @{'/img/logo-hd.png'}"
+                                <img th:src="${trackForm.pictureUrl != null && !trackForm.pictureUrl.isEmpty()}
+                                         ? ${trackForm.pictureUrl}
+                                         : @{'/img/logo-hd.png'}"
                                      class="track-cover-img"
                                      alt="Cover">
                                 <button class="track-item-player-button"
                                         type="button"
+                                        th:data-track-url="${trackForm.trackUrl}"
                                         th:data-track-id="${trackForm.track.id}">
                                     <svg class="icon-svg-play" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd"
