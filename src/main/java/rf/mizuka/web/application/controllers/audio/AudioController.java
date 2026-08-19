@@ -1,25 +1,19 @@
 package rf.mizuka.web.application.controllers.audio;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import rf.mizuka.web.application.database.entities.media.authors.Author;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.forms.home.TrackForm;
 import rf.mizuka.web.application.services.storage.StorageService;
+import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/track")
@@ -34,34 +28,13 @@ public class AudioController
         this.storageService = storageService;
     }
 
-    @GetMapping(value = "/{id}", produces = "text/html")
-    public String trackPage(@PathVariable Long id, Model model)
-    {
-        final Optional<Track> track = trackService.trackRepository().findById(id);
-
-        if(track.isEmpty())
-            model.addAttribute("error", String.format("Track with request id (%d) is not exist!", id));
-        else {
-            Track tr = track.get();
-
-            model.addAttribute("trackForm",
-                    new TrackForm(tr,
-                            storageService.getTrackPresignedUrl(tr.getFilePath()),
-                            storageService.getTrackPictureUrl(tr.getPicturePath()),
-                            trackService.audioService().audioMetadataService().convertDurationToString(tr.getDuration())
-                    ));
-        }
-
-        return "app/tracks/track";
-    }
-
     @ResponseBody
     @GetMapping(value = "/stream/{id}", produces = "audio/mpeg")
     public ResponseEntity<?> currentAudio(
             @PathVariable Long id,
             jakarta.servlet.http.HttpSession session
     )
-            throws IOException
+            throws PresignedUrlException
     {
         final Optional<Track> idTrack = trackService.trackRepository().findById(id);
 
@@ -77,6 +50,7 @@ public class AudioController
 
     @GetMapping("/{trackId}")
     public ResponseEntity<?> getTrack(@PathVariable Long trackId)
+            throws PresignedUrlException
     {
         if (trackId == null)
         {
@@ -96,6 +70,7 @@ public class AudioController
 
     @GetMapping("/current")
     public ResponseEntity<?> getCurrentTrack(HttpSession session)
+            throws PresignedUrlException
     {
         Long trackId = (Long) session.getAttribute("currentTrackId");
         if (trackId == null)
@@ -115,6 +90,7 @@ public class AudioController
     }
 
     private ResponseEntity<?> buildTrackApiAnswer(Track track)
+            throws PresignedUrlException
     {
         return ResponseEntity.ok(Map.of(
             "active", true,
