@@ -7,7 +7,7 @@ fileInput.addEventListener('change', function() {
         fileLabel.textContent = `Выбран: ${fileName}`;
         fileLabel.classList.add('has-file');
     } else {
-        fileLabel.textContent = 'Выберите аудиофайл...';
+        fileLabel.textContent = 'Choose audio file...';
         fileLabel.classList.remove('has-file');
     }
 });

@@ -18,6 +18,8 @@ window.GlobalAudioPlayer =
         this.player = new AudioPlayer();
         this.playlist = new Playlist();
 
+        this.isSeeking = false;
+
         this.playBtn = document.getElementById('player-play-btn');
         this.nextBtn = document.getElementById('player-next-btn');
         this.prevBtn = document.getElementById('player-prev-btn');
@@ -31,6 +33,8 @@ window.GlobalAudioPlayer =
 
     async loadTrack(track)
     {
+        localStorage.setItem('lastPlayedTrackId', track.trackId);
+
         if (track)
         {
             const coverImg = document.getElementById('now-playing-cover');
@@ -65,7 +69,6 @@ window.GlobalAudioPlayer =
         }
 
         await this.player.load(track.url);
-        this.player.play();
     },
 
     async next()
@@ -74,6 +77,7 @@ window.GlobalAudioPlayer =
         if (nextTrack)
         {
             await this.loadTrack(nextTrack);
+            this.player.play();
         }
     },
 
@@ -83,6 +87,7 @@ window.GlobalAudioPlayer =
         if (prevTrack)
         {
             await this.loadTrack(prevTrack);
+            this.player.play();
         }
     },
 
@@ -98,26 +103,13 @@ window.GlobalAudioPlayer =
             this.playBtn.textContent = '▶';
         });
 
-        this.player.on('onTimeUpdate', (currentTime) =>
-         {
-            const status = this.player.getStatus();
-            this.durationSpan.textContent = this._formatTime(status.duration);
-            this.currentTimeSpan.textContent = this._formatTime(currentTime);
-
-            if (status.duration > 0)
-            {
-                const percentage = (currentTime / status.duration) * 100;
-                this.progressInput.value = percentage;
-                this._updateSliderBackground(this.progressInput, percentage, this.currentTrackColor);
-            }
-        });
-
         this.prevBtn.addEventListener('click', async () =>
         {
             const prevTrack = this.playlist.previous();
             if (prevTrack)
             {
                 await this.loadTrack(prevTrack);
+                this.player.play();
             }
         });
 
@@ -134,24 +126,54 @@ window.GlobalAudioPlayer =
             }
         });
 
-       this.nextBtn.addEventListener('click', async () =>
-       {
+        this.nextBtn.addEventListener('click', async () =>
+        {
             const nextTrack = this.playlist.next();
             if (nextTrack)
             {
                 await this.loadTrack(nextTrack);
+                this.player.play();
+            }
+        });
+
+        this.player.on('onTimeUpdate', (currentTime) =>
+        {
+            const status = this.player.getStatus();
+            this.durationSpan.textContent = this._formatTime(status.duration);
+            this.currentTimeSpan.textContent = this._formatTime(currentTime);
+
+            if (status.duration > 0 && !this.isSeeking)
+            {
+                const percentage = (currentTime / status.duration) * 100;
+                this.progressInput.value = percentage;
+                this._updateSliderBackground(this.progressInput, percentage, this.currentTrackColor);
             }
         });
 
         this.progressInput.addEventListener('input', (e) =>
+        {
+            this.isSeeking = true;
+
+            const status = this.player.getStatus();
+            if (status.duration > 0)
+            {
+                const percentage = e.target.value;
+                const targetSeconds = (percentage / 100) * status.duration;
+
+                this.currentTimeSpan.textContent = this._formatTime(targetSeconds);
+                this._updateSliderBackground(this.progressInput, percentage, this.currentTrackColor);
+            }
+        });
+
+        this.progressInput.addEventListener('change', (e) =>
         {
             const status = this.player.getStatus();
             if (status.duration > 0)
             {
                 const percentage = e.target.value;
                 const targetSeconds = (percentage / 100) * status.duration;
+
                 this.player.seek(targetSeconds);
-                this._updateSliderBackground(this.progressInput, percentage, this.currentTrackColor);
             }
         });
     },

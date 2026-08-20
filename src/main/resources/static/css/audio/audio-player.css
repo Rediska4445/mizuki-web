@@ -132,26 +132,6 @@ footer {
     box-sizing: border-box;
 }
 
-.volume-icon {
-    font-size: 13px;
-    color: #b3b3b3;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    background: transparent;
-    cursor: pointer;
-}
-
-input[type="range"]:focus {
-    outline: none;
-}
-
 #player-progress {
     background: linear-gradient(to right, #ffffff 0%, #4d4d4d 0%);
     border-radius: 2px;
@@ -166,6 +146,25 @@ input[type="range"]:focus {
     width: 120px;
     max-width: 140px;
     flex-shrink: 0;
+}
+
+.volume-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    flex-shrink: 0;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type="range"]:focus {
+    outline: none;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
@@ -196,13 +195,6 @@ input[type="range"]::-moz-range-thumb {
     width: 12px;
     border-radius: 50%;
     display: block;
-}
-
-.volume-icon {
-    width: 18px;
-    height: 18px;
-    display: block;
-    flex-shrink: 0;
 }
 
 .side-btn {

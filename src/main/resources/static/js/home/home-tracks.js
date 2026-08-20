@@ -1,6 +1,30 @@
 import Track from './../playlist/track.js';
 
-document.addEventListener('DOMContentLoaded', () =>
+async function restoreLastSession()
+{
+    const lastTrackId = localStorage.getItem('lastPlayedTrackId');
+    if (!lastTrackId)
+        return;
+
+    const player = window.GlobalAudioPlayer;
+    const savedTrack = player.playlist.findTrackById(lastTrackId);
+
+    if (savedTrack)
+    {
+        const targetIndex = player.playlist.getTracks().indexOf(savedTrack);
+        if (targetIndex !== -1)
+        {
+            player.playlist.currentIndex = targetIndex;
+        }
+
+        if (player.player)
+        {
+            await player.loadTrack(savedTrack);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () =>
 {
     if (!window.GlobalAudioPlayer)
         return;
@@ -11,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () =>
         .filter(track => track !== null);
 
     window.GlobalAudioPlayer.playlist.setTracks(tracksPageList);
+
+    await restoreLastSession();
 
     const trackButtons = document.querySelectorAll('.track-item-player-button');
     trackButtons.forEach(button =>
@@ -25,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () =>
             if (targetTrack)
             {
                 await window.GlobalAudioPlayer.loadTrack(targetTrack);
+                window.GlobalAudioPlayer.player.play();
             }
         });
     });

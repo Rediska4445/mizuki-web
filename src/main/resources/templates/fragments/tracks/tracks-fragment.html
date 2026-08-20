@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div th:fragment="tracks-list" class="tracks-list-container">
+        <link th:href="@{/css/buttons/track-item-play-button.css}" rel="stylesheet">
+        <link th:href="@{/css/tables/tracks-table.css}" rel="stylesheet">
+        <link th:href="@{/css/cells/track-item.css}" rel="stylesheet">
+
+        <script th:src="@{/js/home/home-tracks.js}" type="module" defer></script>
+
+        <ul class="tracks-list-view" th:if="${tracks != null and !tracks.isEmpty()}">
+            <li class="track-item" th:each="trackForm : ${tracks}">
+                <div class="track-main-content"
+                     th:data-track-url="${trackForm.trackUrl}"
+                     th:data-track-id="${trackForm.track.id}">
+                    <div class="track-cover-box">
+                        <img th:src="${trackForm.pictureUrl != null && !trackForm.pictureUrl.isEmpty()}
+                                             ? ${trackForm.pictureUrl}
+                                             : @{'/img/logo-hd.png'}"
+                             class="track-cover-img"
+                             alt="Cover">
+                        <button class="track-item-player-button"
+                                type="button">
+                            <svg class="icon-svg-play" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd"
+                                      th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5v-7c0-.41.45-.67.8-.45l5.5 3.5c.33.21.33.7 0 .91l-5.5 3.5c-.35.22-.8-.04-.8-.46z"/>
+                            </svg>
+                            <svg class="icon-svg-pause" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd"
+                                      th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3 13h2V9H9v6zm4 0h2V9h-2v6z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="track-meta-info" th:data-track-color="${trackForm.track.color}">
+                        <span class="track-title-text" th:text="${trackForm.track.title}">The greatest of the world</span>
+                        <span class="track-artist-text" th:text="${#strings.listJoin(trackForm.track.authors.![name], ', ')}">Mizuki</span>
+                    </div>
+                </div>
+
+                <div class="track-duration-box">
+                    <span th:text="${trackForm.stringDuration}">--:--</span>
+                </div>
+            </li>
+        </ul>
+        <div class="empty-state-box" th:if="${tracks == null or tracks.isEmpty()}">
+            <p class="empty-state-text" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                No tracks found for "<span th:text="${searchQuery}"></span>"
+            </p>
+            <p class="empty-state-text" th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                No tracks yet. Be the first!
+            </p>
+        </div>
+    </div>
+</body>
+</html>

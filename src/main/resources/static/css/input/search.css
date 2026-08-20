@@ -1,82 +1,74 @@
-.search {
-    max-width: 480px;
-    margin: 0 auto 2rem;
-    position: relative;
+.search-bar-container {
+    flex: 1 !important;
+    margin: 0 40px !important;
+    display: flex !important;
 }
 
-form {
-    width: 100%; /* Заставляет форму занять всю ширину родительского контейнера */
+.search-form {
+    width: 100% !important;
 }
 
-.search-from-group {
-    position: relative;
-    display: flex;
-    gap: 0.5rem;
-    width: 100%;
+.search-input-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
-.search-from-group input[type="hidden"] {
-    display: none;
+.search-icon {
+    position: absolute !important;
+    left: 16px !important;
+    color: #a3a3a3 !important;
+    pointer-events: none !important;
+    transition: color 0.15s ease !important;
+    z-index: 2 !important;
 }
 
-.search-from-group input[type="text"] {
-    flex: 1;
-    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
-    border: 2px solid #444;
-    border-radius: 16px;
-    padding: 1rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #fff;
-    box-shadow:
-        0 8px 32px rgba(0,0,0,0.4),
-        inset 0 1px 0 rgba(255,255,255,0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(16px);
-    letter-spacing: 0.3px;
+.search-input {
+    width: 100% !important;
+    height: 42px !important;
+    padding: 0 16px 0 48px !important;
+    font-size: 14px !important;
+    font-family: inherit !important;
+    color: #1a1a1a !important;
+    background-color: #f5f5f5 !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 24px !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out !important;
 }
 
-.search-from-group input[type="text"]::placeholder {
-    color: #888;
-    font-weight: 400;
+.search-input::placeholder {
+    color: #a3a3a3 !important;
+    opacity: 1 !important;
 }
 
-/* Hover */
-.search-from-group input[type="text"]:hover {
-    border-color: #666;
-    box-shadow:
-        0 12px 40px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.15);
-    transform: translateY(-2px);
+.search-input:focus {
+    background-color: #ffffff !important;
+    border-color: #737373 !important;
+    box-shadow: 0 0 0 4px rgba(115, 115, 115, 0.08) !important;
 }
 
-.search-from-group input[type="text"]:focus {
-    outline: none;
-    border-color: #00d4ff;
-    box-shadow:
-        0 0 0 4px rgba(0,212,255,0.2),
-        0 16px 48px rgba(0,212,255,0.15),
-        inset 0 1px 0 rgba(255,255,255,0.2);
-    transform: translateY(-2px);
+.search-input:focus + .search-icon {
+    color: #404040 !important;
 }
 
-.search-from-group input:focus ~ ::after {
-    opacity: 1;
-    filter: drop-shadow(0 0 4px rgba(0,212,255,0.5));
+.search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    height: 14px !important;
+    width: 14px !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='18' y1='6' x2='6' y2='18'></line><line x1='6' y1='6' x2='18' y2='18'></line></svg>") !important;
+    background-size: contain !important;
+    cursor: pointer !important;
+    margin-right: 2px !important;
 }
 
 @media (max-width: 768px) {
-    .search {
-        margin: 0 1rem 1.5rem;
-        max-width: none;
+    .search-bar-container {
+        margin: 12px 0 !important;
+        order: 3 !important;
+        flex-basis: 100% !important;
     }
-
-    .search-from-group input[type="text"] {
-        padding: 1.1rem 1.75rem;
-        font-size: 1.05rem;
-    }
-}
-
-.search-from-group input[type="text"]::-webkit-search-cancel-button {
-    -webkit-appearance: none;
 }

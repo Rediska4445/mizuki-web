@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org">
 <head>
-    <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
-    <link th:href="@{/css/audio/player-buttons.css}" rel="stylesheet">
-    <script th:src="@{/js/audio/player.js}" defer></script>
     <title></title>
 </head>
 <body>
     <div th:fragment="bottom-player" class="player-wrapper-inner">
+        <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
+
+        <script th:src="@{/js/playlist/track.js}" type="module" defer></script>
+        <script th:src="@{/js/playlist/playlist.js}" type="module" defer></script>
+        <script th:src="@{/js/audio/audio-player.js}" type="module" defer></script>
+        <script th:src="@{/js/audio/controller/global-player-controller.js}" type="module" defer></script>
+
         <div class="player-info-block">
             <div class="player-cover-wrap">
                 <img id="now-playing-cover" th:src="@{/img/logo-hd.png}" alt="Cover">

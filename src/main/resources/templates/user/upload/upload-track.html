@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your tracks</title>
+    <link rel="stylesheet" th:href="@{/css/tracks.css}" />
+    <link rel="stylesheet" th:href="@{/css/input/input-text.css}" />
+
+    <script th:src="@{/js/tracks.js}"></script>
+</head>
+<body>
+<main id="main-content">
+    <script>window.BottomPlayer.init();</script>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>Tracks</h1>
+            <div class="greeting">
+                Hello, <span th:text="${username}"></span>!
+            </div>
+        </header>
+
+        <div class="upload-section">
+            <form th:action="@{/user/tracks/upload}" method="post" enctype="multipart/form-data" class="upload-form">
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" accept="audio/*" required id="fileInput" />
+                    <label for="fileInput" class="file-label">
+                        Choose audio...
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload track</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>
