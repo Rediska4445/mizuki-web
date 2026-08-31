@@ -60,6 +60,17 @@ public class TrackService
         return trackRepository;
     }
 
+    public Page<TrackForm> getTracksPage(String query, int size)
+    {
+        return searchTracks(query, size).map(
+                e -> new TrackForm(
+                        e,
+                        storageService.getTrackUrl(e.getFilePath()),
+                        storageService.getTrackPictureUrl(e.getPicturePath()),
+                        audioService().audioMetadataService().convertDurationToString(e.getDuration())
+                ));
+    }
+
     public String joinAuthors(Collection<Author> authors)
     {
         return String.join(",",  authors.stream()
