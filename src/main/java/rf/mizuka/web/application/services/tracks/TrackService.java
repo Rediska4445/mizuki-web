@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 @Service
 public class TrackService
 {
+    public static final String AUTHORS_SEPARATOR
+            = ",";
+
     /* Dependency */
     private final ImageService imageService;
     private final AudioService audioService;
