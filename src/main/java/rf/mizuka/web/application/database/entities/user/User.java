@@ -92,4 +92,20 @@ public class User
         this.password = password;
         return this;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        User user = (User) o;
+
+        return Objects.equal(id, user.id) && Objects.equal(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, username);
+    }
 }
