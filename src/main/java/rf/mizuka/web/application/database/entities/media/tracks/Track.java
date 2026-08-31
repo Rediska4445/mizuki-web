@@ -14,7 +14,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "tracks")
 public class Track
+        implements Serializable, Comparable<Track>
 {
+    @Serial
+    private static final long serialVersionUID
+            = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
