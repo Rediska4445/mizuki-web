@@ -43,4 +43,27 @@ public class Track
     private String filePath;
 
     public Track() {}
+
+    @Override
+    public final int compareTo(@NotNull Track o)
+    {
+        return id.compareTo(o.getId());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Track track = (Track) o;
+
+        return Objects.equal(id, track.id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(id);
+    }
 }
