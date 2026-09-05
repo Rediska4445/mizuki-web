@@ -1,26 +1,31 @@
 package rf.mizuka.web.application.services.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rf.mizuka.web.application.controllers.auth.UserExistException;
 import rf.mizuka.web.application.database.entities.user.User;
-import rf.mizuka.web.application.database.repository.UserRepository;
+import rf.mizuka.web.application.database.repository.user.UserRepository;
 
 @Service
 public class UserService
 {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository)
+    {
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public void registerUser(String username, String rawPassword)
             throws UserExistException
     {
-        if (userRepository.existsByUsername(username))
+        Boolean isExist = userRepository.existsByUsername(username);
+
+        if (isExist == null || isExist)
         {
             throw new UserExistException(username);
         }
@@ -30,11 +35,5 @@ public class UserService
         user.setPassword(passwordEncoder.encode(rawPassword));
 
         userRepository.save(user);
-    }
-
-    public User findByUsername(String username)
-    {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 }
