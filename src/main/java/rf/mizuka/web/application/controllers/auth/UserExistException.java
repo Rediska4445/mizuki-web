@@ -1,8 +1,9 @@
 package rf.mizuka.web.application.controllers.auth;
 
-public class UserExistException extends Exception {
-    public UserExistException() {
-    }
+public class UserExistException
+        extends Exception
+{
+    public UserExistException() {}
 
     public UserExistException(String message) {
         super(message);
