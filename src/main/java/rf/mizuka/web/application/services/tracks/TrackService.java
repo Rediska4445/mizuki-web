@@ -109,6 +109,25 @@ public class TrackService
         return trackPage;
     }
 
+    @org.springframework.transaction.annotation.Transactional(
+            readOnly = true
+    )
+    public Page<TrackForm> searchTracks(User user, String query, int size)
+    {
+        List<Long> likedTrackIds = userRepository.findLikedTrackIdsByUserId(user.getId());
+
+        Page<TrackForm> tracks = searchTracks(query, size).map(
+        e -> TrackForm.of(
+                e,
+                isStreamingAudio ? "/audio/stream/" + e.getId() : storageService.getTrackUrl(e.getFilePath()),
+                storageService.getTrackPictureUrl(e.getPicturePath()),
+                audioService.audioMetadataService().convertDurationToString(e.getDuration()),
+                likedTrackIds.contains(e.getId())
+        ));
+
+        return tracks;
+    }
+
     /**
      * Detect color from track picture. Result must be in HEX format.
      * <p>
