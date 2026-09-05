@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.storage.config;
+package rf.mizuka.web.application.configurations.storage;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MinioConfig
+public class StorageConfig
 {
     @Value("${minio.endpoint}")
     private String endpoint;
@@ -40,6 +40,7 @@ public class MinioConfig
         if (!client.bucketExists(BucketExistsArgs.builder().bucket(coversBucket).build()))
         {
             client.makeBucket(MakeBucketArgs.builder().bucket(coversBucket).build());
+        }
 
         String publicPolicyTemplate = """
         {
