@@ -41,27 +41,24 @@ public class MinioConfig
         {
             client.makeBucket(MakeBucketArgs.builder().bucket(coversBucket).build());
 
-            String publicReadPolicy = """
+        String publicPolicyTemplate = """
+        {
+        "Version": "2012-10-17",
+        "Statement": [
                 {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "PublicRead",
-                            "Effect": "Allow",
-                            "Principal": "*",
-                            "Action": ["s3:GetObject"],
-                            "Resource": ["arn:aws:s3:::%s/*"],
-                            "Condition": {
-                                "StringLike": {
-                                    "aws:Referer": [
-                                        "http://localhost:8080/*"
-                                    ]
-                                }
-                            }
-                        }
+                    "Sid": "PublicRead",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": [
+                        "s3:GetObject"
+                    ],
+                    "Resource": [
+                        "arn:aws:s3:::%s/*"
                     ]
                 }
-                """.formatted(coversBucket);
+            ]
+        }
+        """;
 
             client.setBucketPolicy(
                     SetBucketPolicyArgs.builder().bucket(coversBucket).config(publicReadPolicy).build()
