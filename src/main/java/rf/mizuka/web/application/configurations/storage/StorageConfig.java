@@ -60,10 +60,19 @@ public class MinioConfig
         }
         """;
 
-            client.setBucketPolicy(
-                    SetBucketPolicyArgs.builder().bucket(coversBucket).config(publicReadPolicy).build()
-            );
-        }
+        client.setBucketPolicy(
+                SetBucketPolicyArgs.builder()
+                        .bucket(coversBucket)
+                        .config(publicPolicyTemplate.formatted(coversBucket))
+                        .build()
+        );
+
+        client.setBucketPolicy(
+                SetBucketPolicyArgs.builder()
+                        .bucket(tracksBucket)
+                        .config(publicPolicyTemplate.formatted(tracksBucket))
+                        .build()
+        );
 
         return client;
     }
