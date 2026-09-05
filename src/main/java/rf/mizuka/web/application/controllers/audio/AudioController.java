@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/track")
+@RequestMapping("/audio")
 public class AudioController
 {
     private final TrackService trackService;
