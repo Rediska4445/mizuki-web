@@ -1,17 +1,15 @@
-package rf.mizuka.web.application.security.config;
-import com.nimbusds.jose.jwk.JWK;
+package rf.mizuka.web.application.configurations.security;
+
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import rf.mizuka.web.application.security.managers.KeyManager;
+import rf.mizuka.web.application.managers.KeyManager;
 
 @Configuration
 public class JwtConfig
