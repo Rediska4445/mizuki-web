@@ -130,7 +130,7 @@ public class SecurityConfig
             }
             else
             {
-                entryPoint.commence(request, response, null);
+                entryPoint.commence(request, response, new BadCredentialsException("error"));
             }
         };
     }
