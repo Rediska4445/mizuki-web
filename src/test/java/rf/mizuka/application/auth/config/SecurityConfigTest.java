@@ -19,9 +19,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import rf.mizuka.web.application.database.repository.UserRepository;
+import rf.mizuka.web.application.brokers.audio.AudioStreamProducer;
+import rf.mizuka.web.application.brokers.tracks.TrackProducer;
+import rf.mizuka.web.application.controllers.tracks.TracksController;
+import rf.mizuka.web.application.database.repository.user.UserRepository;
 import rf.mizuka.web.application.configurations.security.SecurityConfig;
 import rf.mizuka.web.application.services.audio.AudioService;
+import rf.mizuka.web.application.services.authors.AuthorService;
 import rf.mizuka.web.application.services.storage.StorageService;
 import rf.mizuka.web.application.services.tracks.TrackService;
 import rf.mizuka.web.application.services.user.UserService;
@@ -44,6 +48,18 @@ public class SecurityConfigTest
 {
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private org.springframework.cache.CacheManager cacheManager;
+
+    @MockitoBean
+    private AudioStreamProducer audioStreamProducer;
+
+    @MockitoBean
+    private TracksController tracksController;
+
+    @MockitoBean
+    private TrackProducer trackProducer;
 
     @MockitoBean
     private TrackService trackService;
@@ -72,6 +88,9 @@ public class SecurityConfigTest
     @MockitoBean
     private AuthenticationManager authenticationManager;
 
+    @MockitoBean
+    private AuthorService authorService;
+
     @BeforeEach
     void setUp()
     {
@@ -89,6 +108,7 @@ public class SecurityConfigTest
                 get("/auth/login")
                 // Should return 200 (1 rule)
         ).andExpect(status().isOk());
+
         mockMvc.perform(
                 // Send req to login page
                 get("/auth/register")

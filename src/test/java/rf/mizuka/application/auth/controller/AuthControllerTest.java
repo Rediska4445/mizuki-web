@@ -1,8 +1,12 @@
 package rf.mizuka.application.auth.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,29 +26,44 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
-public class AuthControllerTest {
+public class AuthControllerTest
+{
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private UserService userService;
-
     @MockitoBean
     private AuthenticationManager authenticationManager;
+    @MockitoBean
+    private CacheManager cacheManager;
+
+    @BeforeEach
+    void setUp()
+    {
+        CacheManager realCacheManager = new ConcurrentMapCacheManager();
+        Mockito.when(cacheManager.getCache(Mockito.anyString()))
+                .thenAnswer(invocation -> realCacheManager.getCache(invocation.getArgument(0)));
+    }
 
     @Test
-    void testLoginPageReturnsCorrectViewAndModel() throws Exception {
-        mockMvc.perform(get("/auth/login"))
+    void testLoginPageReturnsCorrectViewAndModel()
+            throws Exception
+    {
+        mockMvc.perform(get("/auth/login")
+                        .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/login"))
+                .andExpect(view().name("pages/auth/login"))
                 .andExpect(model().attributeExists("loginForm"));
     }
 
     @Test
-    void testRegisterPageReturnsCorrectViewAndModel() throws Exception {
-        mockMvc.perform(get("/auth/register"))
+    void testRegisterPageReturnsCorrectViewAndModel()
+            throws Exception
+    {
+        mockMvc.perform(get("/auth/register")
+                        .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/register"))
+                .andExpect(view().name("pages/auth/register"))
                 .andExpect(model().attributeExists("registerForm"));
     }
 
@@ -71,7 +90,7 @@ public class AuthControllerTest {
                         .param("password", "wrong_pass")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/login"))
+                .andExpect(view().name("pages/auth/login"))
                 .andExpect(model().attributeExists("loginError"));
     }
 
@@ -96,12 +115,14 @@ public class AuthControllerTest {
                         .param("confirmPassword", "pass2")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/register"))
+                .andExpect(view().name("pages/auth/register"))
                 .andExpect(model().attribute("registerError", "Passwords do not match."));
     }
 
     @Test
-    void testRegisterUserExists() throws Exception {
+    void testRegisterUserExists()
+            throws Exception
+    {
         doThrow(new IllegalArgumentException("User already exists"))
                 .when(userService).registerUser(anyString(), anyString());
 
@@ -111,7 +132,7 @@ public class AuthControllerTest {
                         .param("confirmPassword", "password")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("auth/register"))
+                .andExpect(view().name("pages/auth/register"))
                 .andExpect(model().attributeExists("registerError"));
     }
 }

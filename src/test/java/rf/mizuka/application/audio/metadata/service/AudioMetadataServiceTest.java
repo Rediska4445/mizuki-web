@@ -12,8 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.services.audio.metadata.AudioMetadataService;
-import rf.mizuka.web.application.services.audio.UnknownAuthorException;
-import rf.mizuka.web.application.services.audio.UnknownTitleException;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownAuthorException;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownTitleException;
 import rf.mizuka.web.application.services.audio.metadata.IAudioMetadata;
 
 import java.io.File;

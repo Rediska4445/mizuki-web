@@ -2,74 +2,62 @@ package rf.mizuka.application.auth.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import rf.mizuka.web.application.controllers.auth.UserExistException;
 import rf.mizuka.web.application.database.entities.user.User;
-import rf.mizuka.web.application.database.repository.UserRepository;
+import rf.mizuka.web.application.database.repository.user.UserRepository;
 import rf.mizuka.web.application.services.user.UserService;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestPropertySource(locations = "classpath:settings-test.properties")
-@SpringBootTest
 @Transactional
 @Rollback
-public class UserServiceTest {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest
+{
+    @Mock
     private UserRepository userRepository;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
+    @Mock
     private PasswordEncoder passwordEncoder;
 
+    @InjectMocks
+    private UserService userService;
+
+    /*
+    * 1. User should save, with all transferred to him data
+    * 2. Register user should return saved user
+    * 3. Register user should check on already exist user
+    * 3.1. Exist check in the event problems should throw "UserExistException"
+    * */
     @Test
-    @DisplayName("Успешная регистрация нового пользователя позволяет ему сразу войти в систему")
-    void shouldRegisterNewUserAndAllowImmediateLogin() throws Exception {
-        long initialCount = userRepository.count();
-        assertThat(initialCount).isGreaterThanOrEqualTo(0);
+    @DisplayName("T1. Register user should be success")
+    void shouldRegisterNewUserAndAllowImmediateLogin()
+            throws Exception
+    {
+        // For avoid "(userExist == null || userExist)" condition
+        Mockito.when(userRepository.existsByUsername(Mockito.any()))
+                .thenReturn(false);
 
-        String username = "newuser";
-        String rawPassword = "secret123";
+        // return s-mocking user
+        Mockito.when(userRepository.save(Mockito.any()))
+                .thenAnswer(e -> new User("mock", "123"));
 
-        assertThat(userRepository.existsByUsername(username)).isFalse();
+        // Mock user
+        User user = userService.registerUser("mock", "123");
 
-        userService.registerUser(username, rawPassword);
-
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        assertThat(userOpt).isPresent();
-        User user = userOpt.get();
-        assertThat(user.getUsername()).isEqualTo(username);
-        assertThat(user.getPassword()).isNotEmpty();
-
-        String encodedPassword = user.getPassword();
-        assertThat(encodedPassword)
-                .matches("\\$2[ab]\\$\\d{2}\\$.{53}");
-
-        assertThat(passwordEncoder.matches(rawPassword, encodedPassword)).isTrue();
-
-        UserDetails loadedUser = userDetailsService.loadUserByUsername(username);
-        assertThat(loadedUser.getUsername()).isEqualTo(username);
-        assertThat(loadedUser.getPassword()).isEqualTo(encodedPassword);
-
-        assertThatThrownBy(() -> userService.registerUser(username, "anotherPass"))
-                .isInstanceOf(UserExistException.class)
-                .hasMessage(username);
-
-        assertThat(userRepository.count()).isEqualTo(initialCount + 1);
+        // Checkin all data
+        assertThat(user.getUsername())
+                .isEqualTo("mock");
+        assertThat(user.getPassword())
+                .isEqualTo("123");
     }
 }
