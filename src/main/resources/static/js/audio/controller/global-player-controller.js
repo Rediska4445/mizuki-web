@@ -1,17 +1,43 @@
+import { getCsrfHeaders } from './../../super.js';
 import { AudioPlayer } from './../audio-player.js';
+import { fade } from './../fader.js';
 import Playlist from './../../playlist/playlist.js';
 import Track from './../../playlist/track.js';
+
+const ICON_PLAY = '▶';
+const ICON_PAUSE = '⏸';
+
+function sendListenEventToServer(trackId)
+{
+    fetch(`/audio/stream/${trackId}/complete`,
+    {
+        method: 'POST',
+        headers:
+        {
+            'Content-Type': 'application/json',
+            ...getCsrfHeaders()
+        }
+    })
+    .catch(error => console.error("error sending audio complete request:", error));
+};
 
 window.GlobalAudioPlayer =
 {
     player: null,
+    playlist: null,
+    globalPause: false,
     playBtn: null,
     nextBtn: null,
     prevBtn: null,
     progressInput: null,
     currentTimeSpan: null,
     durationSpan: null,
+    playerVolume: 0.0,
+    fadeDurationSeconds: 0.200,
     currentTrackColor: '#ffffff',
+    isTracked: false,
+    listeningThreshold: null,
+    currentTrackId: null,
 
     init()
     {
@@ -33,8 +59,6 @@ window.GlobalAudioPlayer =
 
     async loadTrack(track)
     {
-        localStorage.setItem('lastPlayedTrackId', track.trackId);
-
         if (track)
         {
             const coverImg = document.getElementById('now-playing-cover');
@@ -60,7 +84,7 @@ window.GlobalAudioPlayer =
         if (this.currentTimeSpan)
             this.currentTimeSpan.textContent = '0:00';
         if (this.durationSpan)
-            this.durationSpan.textContent = '0:00';
+            this.durationSpan.textContent = '--:--';
 
         const targetTrack = this.playlist.findTrackById(track.trackId);
         if (targetTrack)
@@ -68,7 +92,13 @@ window.GlobalAudioPlayer =
             this.playlist.currentIndex = this.playlist.getTracks().indexOf(targetTrack);
         }
 
+        this.currentTrackId = track.trackId;
+
         await this.player.load(track.url);
+        this.player.setVolume(this.playerVolume);
+
+        this.listeningThreshold = null;
+        this.isTracked = false;
     },
 
     async next()
@@ -77,7 +107,10 @@ window.GlobalAudioPlayer =
         if (nextTrack)
         {
             await this.loadTrack(nextTrack);
-            this.player.play();
+            if(!this.globalPause)
+            {
+                this.player.play();
+            }
         }
     },
 
@@ -87,66 +120,181 @@ window.GlobalAudioPlayer =
         if (prevTrack)
         {
             await this.loadTrack(prevTrack);
-            this.player.play();
+            if(!this.globalPause)
+            {
+                this.player.play();
+            }
         }
+    },
+
+    save()
+    {
+        if (!this.player)
+        {
+            throw new Error('Failed to save this.player state: this.player object is missing.');
+        }
+        if (!this.player?.audio)
+        {
+            throw new Error('Failed to save this.player state: this.player.player.audio element is missing.');
+        }
+        if (!this.playlist || typeof this.playlist.serialize !== 'function')
+        {
+            throw new Error('Failed to save this.player state: playlist is missing or doesn\'t have a serialize method.');
+        }
+
+        localStorage.setItem('lastPlayedTrackId', this.playlist.getCurrentTrack().trackId);
+        localStorage.setItem('lastPlayedTrack', this.playlist.getCurrentTrack().serialize());
+        localStorage.setItem('lastPlayedTrackPosition', this.player.audio.currentTime);
+        localStorage.setItem('lastVolume', this.playerVolume);
+        localStorage.setItem('lastPlaylist', this.playlist.serialize());
+    },
+
+    // static function
+    read(existingPlayer = null)
+    {
+        const rawPosition = localStorage.getItem('lastPlayedTrackPosition');
+        const rawVolume = localStorage.getItem('lastVolume');
+        const rawTrack = localStorage.getItem('lastPlayedTrack');
+        const rawPlaylist = localStorage.getItem('lastPlaylist');
+
+        if (rawPosition === null || rawVolume === null)
+        {
+            throw new Error('Failed to restore player state: One or more localStorage keys are missing.');
+        }
+
+        const volume = parseFloat(rawVolume);
+        if (isNaN(volume))
+        {
+            throw new Error(`Failed to restore player state: lastVolume in localStorage is not a valid number ("${rawVolume}").`);
+        }
+
+        const position = parseFloat(rawPosition);
+        if (isNaN(position))
+        {
+            throw new Error(`Failed to restore player state: lastPlayedTrackPosition in localStorage is not a valid number ("${rawPosition}").`);
+        }
+
+        let targetPlayer;
+
+        if (existingPlayer !== null && existingPlayer !== undefined)
+        {
+            targetPlayer = existingPlayer;
+        }
+        else
+        {
+            targetPlayer = new this();
+            targetPlayer.init();
+        }
+
+        if (!targetPlayer.player)
+        {
+            throw new Error('Failed to restore player state: targetPlayer.player object is missing.');
+        }
+        if (!targetPlayer.player.audio)
+        {
+            throw new Error('Failed to restore player state: targetPlayer.player.audio element is missing.');
+        }
+
+        if(rawPlaylist)
+            targetPlayer.playlist = Playlist.deserialize(rawPlaylist);
+
+        targetPlayer.playerVolume = volume;
+        targetPlayer.player.audio.currentTime = position;
+
+        targetPlayer.loadTrack(JSON.parse(rawTrack));
+
+        return targetPlayer;
     },
 
     _bindEvents()
     {
         this.player.on('onPlay', () =>
         {
-            this.playBtn.textContent = '⏸';
+            if(this.playBtn.textContent !== ICON_PAUSE)
+                this.playBtn.textContent = ICON_PAUSE;
+
+            this.globalPause = false;
         });
 
         this.player.on('onPause', () =>
         {
-            this.playBtn.textContent = '▶';
+            if(this.playBtn.textContent !== ICON_PLAY)
+                this.playBtn.textContent = ICON_PLAY;
+
+            this.globalPause = true;
+        });
+
+        this.player.on('onEnded', () =>
+        {
+            this.nextBtn.click();
         });
 
         this.prevBtn.addEventListener('click', async () =>
         {
-            const prevTrack = this.playlist.previous();
-            if (prevTrack)
-            {
-                await this.loadTrack(prevTrack);
-                this.player.play();
-            }
+            await this.previous();
         });
 
         this.playBtn.addEventListener('click', () =>
         {
             const status = this.player.getStatus();
             if (status.isPlaying)
-             {
-                this.player.pause();
+            {
+                this.playBtn.textContent = ICON_PLAY;
+
+                fade(this.player.audio.volume, 0, this.fadeDurationSeconds, (v) => this.player.setVolume(v))
+                    .then(() => this.player.pause());
             }
             else
             {
+                this.playBtn.textContent = ICON_PAUSE;
+
                 this.player.play();
+
+                fade(this.player.audio.volume, this.playerVolume, this.fadeDurationSeconds, (v) => this.player.setVolume(v));
             }
         });
 
         this.nextBtn.addEventListener('click', async () =>
         {
-            const nextTrack = this.playlist.next();
-            if (nextTrack)
-            {
-                await this.loadTrack(nextTrack);
-                this.player.play();
-            }
+            await this.next();
         });
 
         this.player.on('onTimeUpdate', (currentTime) =>
         {
             const status = this.player.getStatus();
-            this.durationSpan.textContent = this._formatTime(status.duration);
-            this.currentTimeSpan.textContent = this._formatTime(currentTime);
 
             if (status.duration > 0 && !this.isSeeking)
             {
+                this.durationSpan.textContent = this._formatTime(status.duration);
+                this.currentTimeSpan.textContent = this._formatTime(currentTime);
+
                 const percentage = (currentTime / status.duration) * 100;
                 this.progressInput.value = percentage;
                 this._updateSliderBackground(this.progressInput, percentage, this.currentTrackColor);
+            }
+
+            if (this.listeningThreshold === null && this.player.audio.duration > 0)
+            {
+                const restoredTime = this.player.audio.currentTime;
+                const totalDuration = this.player.audio.duration;
+                const standardThreshold = totalDuration / 10;
+
+                if (restoredTime < standardThreshold)
+                {
+                    this.listeningThreshold = standardThreshold;
+                }
+                else
+                {
+                    const remainingDuration = totalDuration - restoredTime;
+                    this.listeningThreshold = restoredTime + (remainingDuration / 10);
+                }
+            }
+
+            if (this.listeningThreshold !== null && this.player.audio.currentTime >= this.listeningThreshold && !this.isTracked)
+            {
+                this.isTracked = true;
+
+                sendListenEventToServer(this.currentTrackId);
             }
         });
 
@@ -167,6 +315,8 @@ window.GlobalAudioPlayer =
 
         this.progressInput.addEventListener('change', (e) =>
         {
+            this.isSeeking = false;
+
             const status = this.player.getStatus();
             if (status.duration > 0)
             {
@@ -192,7 +342,7 @@ window.GlobalAudioPlayer =
 
                 if (this.player && typeof this.player.setVolume === 'function')
                 {
-                    this.player.setVolume(e.target.value);
+                    this.player.setVolume(this.playerVolume = e.target.value);
                 }
             });
         }

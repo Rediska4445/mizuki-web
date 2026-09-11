@@ -1,5 +1,5 @@
 class Track
- {
+{
     constructor(url, trackId, meta = null)
     {
         if (!url || typeof url !== 'string' || url.trim() === '')
@@ -16,6 +16,15 @@ class Track
             cover: meta?.cover || '/img/logo-hd.png',
             color: meta?.color || '#ffffff'
         };
+    }
+
+    serialize()
+    {
+        return JSON.stringify({
+            url: this.url,
+            trackId: this.trackId,
+            meta: this.meta
+        });
     }
 
     static fromDOMElement(container)

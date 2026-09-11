@@ -1,4 +1,4 @@
-import Track from './Track.js';
+import Track from './track.js';
 
 class Playlist
 {
@@ -125,7 +125,7 @@ class Playlist
     }
 
     setTracks(newTracks)
-     {
+    {
         const currentTrackBeforeUpdate = this.getCurrentTrack();
         this.tracks = [];
 
@@ -170,6 +170,55 @@ class Playlist
     size()
     {
         return this.tracks.length;
+    }
+
+    serialize()
+    {
+        return JSON.stringify({
+            tracks: this.tracks,
+            currentIndex: this.currentIndex
+        });
+    }
+
+    static deserialize(jsonString)
+    {
+        try
+        {
+            if (!jsonString)
+            {
+                throw new Error('Failed to deserialize Playlist: jsonString is empty or missing.');
+            }
+
+            const data = JSON.parse(jsonString);
+
+            if (!data || typeof data !== 'object')
+            {
+                throw new Error('Failed to deserialize Playlist: parsed data is not a valid object.');
+            }
+
+            if (!Array.isArray(data.tracks))
+            {
+                throw new Error('Failed to deserialize Playlist: "tracks" property is missing or is not an array.');
+            }
+
+            const tracks = data.tracks.map(t => new Track(t.url, t.trackId, t.meta));
+            const playlist = new Playlist(tracks);
+
+            if (typeof data.currentIndex !== 'number')
+            {
+                throw new Error(`Failed to deserialize Playlist: "currentIndex" must be a number, got "${typeof data.currentIndex}".`);
+            }
+
+            playlist.currentIndex = data.currentIndex;
+
+            return playlist;
+        }
+        catch (error)
+        {
+            console.error("error:", error);
+
+            return new Playlist()
+        }
     }
 }
 

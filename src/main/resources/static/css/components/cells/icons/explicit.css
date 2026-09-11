@@ -1,0 +1,28 @@
+.explicit-container
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    top: 0.5px;
+    line-height: 0;
+}
+
+.explicit-badge
+{
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: #212121;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 12px;
+    padding: 0;
+    margin: 0;
+    border-radius: 2px;
+    box-sizing: border-box;
+}
