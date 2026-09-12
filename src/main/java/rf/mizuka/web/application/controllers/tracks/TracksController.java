@@ -19,6 +19,7 @@ import rf.mizuka.web.application.database.entities.user.User;
 import rf.mizuka.web.application.forms.home.TrackForm;
 import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownAuthorException;
 import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownTitleException;
+import rf.mizuka.web.application.services.authors.AuthorService;
 import rf.mizuka.web.application.services.tracks.exceptions.TrackAlreadyExist;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
@@ -31,14 +32,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @Controller
 @RequestMapping("/tracks")
-public final class TracksController
+public class TracksController
 {
     private final TrackProducer trackProducer;
+    private final AuthorService authorService;
     private final TrackService trackService;
 
-    public TracksController(TrackProducer trackProducer, TrackService trackService)
+    public TracksController(TrackProducer trackProducer, AuthorService authorService, TrackService trackService)
     {
         this.trackProducer = trackProducer;
+        this.authorService = authorService;
         this.trackService = trackService;
     }
 
@@ -89,9 +92,12 @@ public final class TracksController
             @RequestParam("trackId") Long trackId,
             @RequestParam("isLike") Boolean isLike
     ) {
+        log.info("user {} liked track {} liked {}", user, trackId, isLike);
+
         if(trackId < 0)
             throw new IllegalArgumentException("trackId must be non-null");
 
+        // Send kafka request to like track
         trackProducer.logTrackLikeAction(TrackLikeEvent.builder()
                 .trackId(trackId)
                 .userId(user.getId())
@@ -126,8 +132,8 @@ public final class TracksController
                 if(track.getFileOwner() == null)
                     track.setFileOwner(fileOwner);
 
-                track.setTitle(title);
-                track.setAuthors(Arrays.stream(authors.split(TrackService.AUTHORS_SEPARATOR)).map(Author::new).collect(Collectors.toSet()));
+                track.setTitle(title.trim());
+                track.setAuthors(authorService.splitAuthors(authors.trim()));
                 track.setDuration(Duration.ofMillis(durationInMs));
                 track.setIsExplicit(isExplicit);
 

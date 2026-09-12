@@ -45,6 +45,7 @@ public interface TrackRepository
             LEFT JOIN t.authors a
             WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :query, '%'))
             OR LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%'))
+            OR LOWER(t.description) LIKE LOWER(CONCAT('%', :query, '%'))
             OR CAST(t.duration AS string) LIKE CONCAT('%', :query, '%')
     """)
     Page<Track> searchTracks(

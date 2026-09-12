@@ -119,4 +119,14 @@ public class Track
     {
         return Objects.hashCode(id);
     }
+
+    @Override
+    public String toString()
+    {
+        return "Track{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", filePath='" + filePath + '\'' +
+                '}';
+    }
 }

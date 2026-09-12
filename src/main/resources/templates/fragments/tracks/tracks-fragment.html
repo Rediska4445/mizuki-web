@@ -5,56 +5,82 @@
     <title></title>
 </head>
 <body>
-    <div th:fragment="tracks-list" class="tracks-list-container">
-        <link th:href="@{/css/buttons/track-item-play-button.css}" rel="stylesheet">
-        <link th:href="@{/css/tables/tracks-table.css}" rel="stylesheet">
-        <link th:href="@{/css/cells/track-item.css}" rel="stylesheet">
+    <div th:fragment="tracks-fragment" class="tracks-list-fragment">
+        <link th:href="@{/css/components/buttons/track-item-play-button.css}" rel="stylesheet">
+        <link th:href="@{/css/components/tables/tracks-table.css}" rel="stylesheet">
+        <link th:href="@{/css/components/cells/track-item.css}" rel="stylesheet">
+        <link th:href="@{/css/components/cells/icons/explicit.css}" rel="stylesheet">
 
-        <script th:src="@{/js/home/home-tracks.js}" type="module" defer></script>
+        <script th:src="@{/js/playlist/track.js}" type="module" defer ></script>
+        <script th:src="@{/js/scripts/home/fragments/track-list.js}" type="module" defer ></script>
 
-        <ul class="tracks-list-view" th:if="${tracks != null and !tracks.isEmpty()}">
-            <li class="track-item" th:each="trackForm : ${tracks}">
-                <div class="track-main-content"
-                     th:data-track-url="${trackForm.trackUrl}"
-                     th:data-track-id="${trackForm.track.id}">
-                    <div class="track-cover-box">
-                        <img th:src="${trackForm.pictureUrl != null && !trackForm.pictureUrl.isEmpty()}
+        <div th:fragment="tracks-list" class="tracks-list-container">
+            <ul class="tracks-list-view" th:if="${tracks != null and !tracks.isEmpty()}">
+                <li class="track-item"
+                    th:each="trackForm : ${tracks}"
+                    th:style="'--track-color: ' + ${trackForm.track.color} + ';'">
+                    <div class="track-main-content"
+                         th:data-track-url="${trackForm.trackUrl}"
+                         th:data-track-id="${trackForm.track.id}">
+                        <div class="track-cover-box">
+                            <img th:src="${trackForm.pictureUrl != null && !trackForm.pictureUrl.isEmpty()}
                                              ? ${trackForm.pictureUrl}
                                              : @{'/img/logo-hd.png'}"
-                             class="track-cover-img"
-                             alt="Cover">
-                        <button class="track-item-player-button"
-                                type="button">
-                            <svg class="icon-svg-play" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd"
-                                      th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
-                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5v-7c0-.41.45-.67.8-.45l5.5 3.5c.33.21.33.7 0 .91l-5.5 3.5c-.35.22-.8-.04-.8-.46z"/>
-                            </svg>
-                            <svg class="icon-svg-pause" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd"
-                                      th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
-                                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3 13h2V9H9v6zm4 0h2V9h-2v6z"/>
+                                 class="track-cover-img"
+                                 alt="Cover">
+                            <button class="track-item-player-button"
+                                    type="button">
+                                <svg class="icon-svg-play" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd"
+                                          th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5v-7c0-.41.45-.67.8-.45l5.5 3.5c.33.21.33.7 0 .91l-5.5 3.5c-.35.22-.8-.04-.8-.46z"/>
+                                </svg>
+                                <svg class="icon-svg-pause" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd"
+                                          th:style="'fill: ' + ${trackForm.track.color} + ' !important;'"
+                                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-3 13h2V9H9v6zm4 0h2V9h-2v6z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="track-meta-info" th:data-track-color="${trackForm.track.color}">
+                            <div class="track-title-wrapper">
+                                <span class="track-title-text" th:text="${trackForm.track.title}">The greatest of the world</span>
+                                <div th:if="${trackForm.track.isExplicit == true}" class="explicit-container">
+                                    <div class="explicit-badge" aria-label="Explicit content">E</div>
+                                </div>
+                            </div>
+                            <span class="track-artist-text" th:text="${#strings.listJoin(trackForm.track.authors.![name], ', ')}">Mizuki</span>
+                        </div>
+                    </div>
+                    <div class="track-left-box-wrapper">
+                        <div class="track-plays-count-box">
+                            <span class="track-plays-count-text" th:text="${trackForm.track.playsCount}">0</span>
+                        </div>
+
+                        <button class="track-like-button"
+                                aria-label="Like track"
+                                th:classappend="${trackForm.isLike} ? 'active' : ''"
+                                th:style="'--track-like-button-color: ' + ${trackForm.track.color} + ';'">
+                            <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                             </svg>
                         </button>
-                    </div>
-                    <div class="track-meta-info" th:data-track-color="${trackForm.track.color}">
-                        <span class="track-title-text" th:text="${trackForm.track.title}">The greatest of the world</span>
-                        <span class="track-artist-text" th:text="${#strings.listJoin(trackForm.track.authors.![name], ', ')}">Mizuki</span>
-                    </div>
-                </div>
 
-                <div class="track-duration-box">
-                    <span th:text="${trackForm.stringDuration}">--:--</span>
-                </div>
-            </li>
-        </ul>
-        <div class="empty-state-box" th:if="${tracks == null or tracks.isEmpty()}">
-            <p class="empty-state-text" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
-                No tracks found for "<span th:text="${searchQuery}"></span>"
-            </p>
-            <p class="empty-state-text" th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
-                No tracks yet. Be the first!
-            </p>
+                        <div class="track-duration-box">
+                            <span th:text="${trackForm.stringDuration}">--:--</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="empty-state-box" th:if="${tracks == null or tracks.isEmpty()}">
+                <p class="empty-state-text" th:if="${searchQuery != null and !searchQuery.isEmpty()}">
+                    No tracks found for "<span th:text="${searchQuery}"></span>"
+                </p>
+                <p class="empty-state-text" th:unless="${searchQuery != null and !searchQuery.isEmpty()}">
+                    No tracks yet. Be the first!
+                </p>
+            </div>
         </div>
     </div>
 </body>

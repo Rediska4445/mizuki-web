@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.services.audio;
+package rf.mizuka.web.application.services.audio.metadata.exceptions;
 
 public class UnknownTitleException
         extends Exception

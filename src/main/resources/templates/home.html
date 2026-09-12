@@ -1,24 +1,37 @@
+<!--/*
+    Main page in server (home)
+    Open for address index.html, or /.
+
+    Rediska4445
+*/-->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <th:block th:replace="~{fragments/super :: super-head}"></th:block>
+
+    <link th:href="@{/css/styles/home/main-landing.css}" rel="stylesheet" >
+    <link th:href="@{/css/components/audio/audio-player.css}" rel="stylesheet" >
+
     <title>Mizuki</title>
-    <link th:href="@{/css/main-landing.css}" rel="stylesheet">
-    <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
-
-    <script th:src="@{/js/playlist/track.js}" type="module" defer></script>
-
-    <meta th:name="_csrf" th:content="${_csrf.token}"/>
-    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
+<body hx-boost="true" hx-ext="head-support">
+    <script th:src="@{/js/scripts/home/home.js}" type="module" defer></script>
+
+    <!-- header -->
+    <header>
+        <div th:replace="~{fragments/header/header-fragment :: main-header}"></div>
+    </header>
+
+    <!-- main content -->
     <main id="main-content">
-        <div class="container">
-            <div th:replace="~{fragments/header/header-fragment :: main-header}"></div>
-            <div th:replace="~{fragments/tracks/tracks-fragment :: tracks-list}"></div>
+        <div class="tracks-player-wrapper">
+            <div th:replace="~{fragments/tracks/tracks-fragment :: tracks-fragment}"></div>
         </div>
     </main>
-    <footer>
+
+    <!-- player -->
+    <footer id="global-audio-player" hx-preserve="true">
         <div th:replace="~{fragments/player/global-bottom-player :: bottom-player}"></div>
     </footer>
 </body>

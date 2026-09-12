@@ -1,8 +1,9 @@
-package rf.mizuka.web.application.security.managers;
+package rf.mizuka.web.application.managers;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
@@ -12,12 +13,16 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
+@Getter
 @Component
-public class KeyManager {
+public class KeyManager
+{
     private RSAKey rsaKey;
 
     @PostConstruct
-    public void init() throws NoSuchAlgorithmException {
+    public void init()
+            throws NoSuchAlgorithmException
+    {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
@@ -28,15 +33,16 @@ public class KeyManager {
                 .build();
     }
 
-    public RSAPublicKey getPublicKey() throws JOSEException {
+    public RSAPublicKey getPublicKey()
+            throws JOSEException
+    {
         return rsaKey.toRSAPublicKey();
     }
 
-    public RSAPrivateKey getPrivateKey() throws JOSEException {
+    public RSAPrivateKey getPrivateKey()
+            throws JOSEException
+    {
         return rsaKey.toRSAPrivateKey();
     }
 
-    public RSAKey getRsaKey() {
-        return rsaKey;
-    }
 }

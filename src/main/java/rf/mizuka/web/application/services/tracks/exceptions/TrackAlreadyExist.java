@@ -1,4 +1,4 @@
-package rf.mizuka.web.application.services.tracks;
+package rf.mizuka.web.application.services.tracks.exceptions;
 
 public class TrackAlreadyExist
         extends RuntimeException

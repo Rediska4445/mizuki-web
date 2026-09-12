@@ -4,12 +4,17 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import rf.mizuka.web.application.services.file.FileService;
+import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -107,23 +112,41 @@ public class StorageService
         return coverKey;
     }
 
-    public String getTrackPresignedUrl(String trackFileName)
-    {
+    public String getPresignedUrl(
+            String bucket, String fileName, TimeUnit timeUnit, int duration
+    ) throws PresignedUrlException {
         try
         {
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
-                            .bucket(tracksBucket)
-                            .object(trackFileName)
-                            .expiry(10, TimeUnit.SECONDS)
+                            .bucket(bucket)
+                            .object(fileName)
+                            .expiry(duration, timeUnit)
                             .build()
             );
         }
         catch (Exception e)
         {
-            throw new RuntimeException("I could not generate the URL", e);
+            throw new PresignedUrlException("I could not generate the URL");
         }
+    }
+
+    public String getTrackPicturePresignedUrl(String coverFileName)
+            throws PresignedUrlException
+    {
+        return getPresignedUrl(coversBucket, coverFileName, TimeUnit.SECONDS, 5);
+    }
+
+    public String getTrackPresignedUrl(String trackFileName)
+            throws PresignedUrlException
+    {
+        return getPresignedUrl(tracksBucket, trackFileName, TimeUnit.SECONDS, 5);
+    }
+
+    public String getTrackUrl(String trackFileName)
+    {
+        return getFile(tracksBucket, trackFileName);
     }
 
     public void deleteTrack(String trackFileName)
@@ -138,18 +161,57 @@ public class StorageService
 
     private void deleteFile(String bucketName, String fileName)
     {
-        if (fileName == null || fileName.isBlank()) {
+        if (fileName == null || fileName.isBlank())
+        {
             return;
         }
-        try {
+
+        try
+        {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(bucketName)
                             .object(fileName)
                             .build()
             );
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException("Could not remove file from MinIO. Bucket: " + bucketName, e);
+        }
+    }
+
+    public Resource getTrackResource(String filePath)
+    {
+        try
+        {
+            StatObjectResponse stat = minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(tracksBucket)
+                            .object(filePath)
+                            .build()
+            );
+            long trackSize = stat.size();
+
+            InputStream inputStream = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(tracksBucket)
+                            .object(filePath)
+                            .build()
+            );
+
+            return new InputStreamResource(inputStream)
+            {
+                @Override
+                public long contentLength()
+                {
+                    return trackSize;
+                }
+            };
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Could not get resource from MinIO: " + filePath, e);
         }
     }
 }

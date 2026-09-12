@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rf.mizuka.web.application.database.repository.UserRepository;
+import rf.mizuka.web.application.database.repository.user.UserRepository;
 
 @Service
 public class CustomUserDetailsService

@@ -19,21 +19,20 @@ public class UserService
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    public void registerUser(String username, String rawPassword)
+    @Transactional(rollbackFor = Exception.class)
+    public User registerUser(String username, String rawPassword)
             throws UserExistException
     {
-        Boolean isExist = userRepository.existsByUsername(username);
+        Boolean userExist
+                = userRepository.existsByUsername(username);
 
-        if (isExist == null || isExist)
-        {
+        if (userExist == null || userExist)
             throw new UserExistException(username);
-        }
 
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(rawPassword));
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

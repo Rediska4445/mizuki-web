@@ -5,9 +5,9 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
-import rf.mizuka.web.application.services.audio.InvalidAudioDurationException;
-import rf.mizuka.web.application.services.audio.UnknownAuthorException;
-import rf.mizuka.web.application.services.audio.UnknownTitleException;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.InvalidAudioDurationException;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownAuthorException;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.UnknownTitleException;
 import rf.mizuka.web.application.services.audio.metadata.IAudioMetadata;
 
 import java.io.File;

@@ -16,5 +16,11 @@ import rf.mizuka.web.application.brokers.tracks.events.TrackLikeEvent;
 })
 public abstract class BaseEvent<K>
 {
+    /**
+     * Ключ для слушателя кафки.
+     * <p>
+     *     Необходим для синхронизации запросов.
+     * </p>
+     * */
     public abstract K key();
 }

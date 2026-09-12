@@ -37,7 +37,7 @@ public class TrackConsumer
     )
     public void processLikesBatch(List<TrackLikeEvent> records)
     {
-        log.info("consume event: {}", records);
+        log.info("kafka consume event: {}", records);
 
         trackService.saveAggregatedLikes(records);
     }

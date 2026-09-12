@@ -1,11 +1,6 @@
 package rf.mizuka.web.application.controllers.home;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,13 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import rf.mizuka.web.application.database.entities.user.User;
-import rf.mizuka.web.application.database.repository.user.UserRepository;
 import rf.mizuka.web.application.forms.home.TrackForm;
 import rf.mizuka.web.application.services.storage.StorageService;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.security.Principal;
-import java.util.List;
 
 @Slf4j
 @Controller

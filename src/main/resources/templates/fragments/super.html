@@ -1,0 +1,28 @@
+<!-- This file is define "super-data" for all pages -->
+<!-- He should require as fragment in all extends html files -->
+<!-- Edit this file can influence to all logic in client side! -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+    <th:block th:fragment="super-head">
+        <!-- Charset -->
+        <meta charset="UTF-8">
+        <!-- Adaptive -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Include to meta inf CSRF token, which transferred from server -->
+        <!-- It is needed for send safe request to server from JavaScript code -->
+        <meta th:name="_csrf" th:content="${_csrf.token}"/>
+        <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+        <!-- Root styles (v. original file) -->
+        <link rel="stylesheet" th:href="@{/css/root.css}">
+        <!-- Library for SPA (single page application) implementation -->
+<!--        <script th:src="@{/js/libs/turbo.js}"></script>-->
+        <script th:src="@{/js/libs/htmx.js}"></script>
+        <script th:src="@{/js/libs/htmx-head-support.js}"></script>
+
+        <!-- Same, just for JavaScript -->
+<!--        <script th:src="@{/js/super.js}" type="module" defer></script> -->
+    </th:block>
+</html>

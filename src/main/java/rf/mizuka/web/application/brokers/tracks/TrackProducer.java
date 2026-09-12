@@ -21,7 +21,7 @@ public class TrackProducer
 
     public void logTrackLikeAction(TrackLikeEvent event)
     {
-        log.info("produce event: {}", event);
+        log.info("kafka produce event: {}", event);
 
         kafkaTemplate.send(TRACK_LIKES_TOPIC, event.key(), event);
     }

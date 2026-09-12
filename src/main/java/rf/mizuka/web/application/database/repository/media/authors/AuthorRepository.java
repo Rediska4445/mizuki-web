@@ -21,6 +21,6 @@ public interface AuthorRepository
     default Author buildOrGet(String name)
     {
         return findByName(name)
-                .orElseGet(() -> save(new Author(name)));
+                .orElseGet(() -> save(new Author(name.trim())));
     }
 }

@@ -5,12 +5,13 @@
 </head>
 <body>
     <div th:fragment="bottom-player" class="player-wrapper-inner">
-        <link th:href="@{/css/audio/audio-player.css}" rel="stylesheet">
+        <link th:href="@{/css/components/audio/audio-player.css}" rel="stylesheet">
 
         <script th:src="@{/js/playlist/track.js}" type="module" defer></script>
         <script th:src="@{/js/playlist/playlist.js}" type="module" defer></script>
         <script th:src="@{/js/audio/audio-player.js}" type="module" defer></script>
         <script th:src="@{/js/audio/controller/global-player-controller.js}" type="module" defer></script>
+        <script th:src="@{/js/scripts/audio/player.js}" type="module" defer></script>
 
         <div class="player-info-block">
             <div class="player-cover-wrap">
@@ -40,7 +41,7 @@
             <div class="timeline-container">
                 <span id="player-current-time">0:00</span>
                 <input type="range" id="player-progress" min="0" max="100" value="0">
-                <span id="player-duration">0:00</span>
+                <span id="player-duration">--:--</span>
             </div>
         </div>
 
