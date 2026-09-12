@@ -2,7 +2,8 @@ package rf.mizuka.web.application.database.entities.user;
 
 import com.google.common.base.Objects;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,6 @@ import java.util.Collections;
 import java.util.Set;
 
 @Entity
-@ToString
 @AllArgsConstructor
 @Table(name = "users")
 public class User
