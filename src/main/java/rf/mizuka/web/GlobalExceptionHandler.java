@@ -19,7 +19,7 @@ public class GlobalExceptionHandler
     })
     public ResponseEntity<Map<String, String>> handleAnyException(Exception e)
     {
-        log.error("exception by GlobalExceptionHandler-handleAnyException: ", e);
+        log.error("exception by handleAnyException: ", e);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentialsException(RuntimeException e)
     {
-        log.error("exception by GlobalExceptionHandler-handleBadCredentialsException: ", e);
+        log.error("exception by handleBadCredentialsException: ", e);
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
