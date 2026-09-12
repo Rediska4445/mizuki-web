@@ -21,7 +21,6 @@ public class AuthorService
         this.authorsSeparator = authorsSeparator;
     }
 
-    // Arrays.stream(authors.split(TrackService.AUTHORS_SEPARATOR)).map(Author::new).collect(Collectors.toSet())
     public Set<Author> splitAuthors(String authors)
     {
         return Arrays.stream(authors.split(authorsSeparator)).map(Author::new).collect(Collectors.toSet());
