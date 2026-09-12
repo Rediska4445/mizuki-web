@@ -20,6 +20,7 @@ public class StorageConfig
     @Value("${minio.secretKey}")
     private String secretKey;
 
+    /* Create storage client (miniO) and provide him like as spring bean*/
     @Bean
     public MinioClient minioClient()
             throws Exception

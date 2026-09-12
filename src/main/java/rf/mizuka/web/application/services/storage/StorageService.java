@@ -1,22 +1,16 @@
 package rf.mizuka.web.application.services.storage;
 
-import io.minio.*;
-import io.minio.errors.*;
-import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import rf.mizuka.web.application.clients.storage.StorageClient;
 import rf.mizuka.web.application.services.file.FileService;
 import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -24,23 +18,24 @@ import java.util.concurrent.TimeUnit;
 public class StorageService
 {
     private final FileService fileService;
-    private final MinioClient minioClient;
+    private final StorageClient storageClient;
     private final String coversBucket;
     private final String tracksBucket;
     private final String publicUrl;
 
-    public StorageService(FileService fileService, MinioClient minioClient,
+    public StorageService(FileService fileService, StorageClient storageClient,
                           @Value("${minio.buckets.covers}") String coversBucket,
                           @Value("${minio.buckets.tracks}") String tracksBucket,
                           @Value("${minio.public-url}") String publicUrl)
     {
         this.fileService = fileService;
-        this.minioClient = minioClient;
+        this.storageClient = storageClient;
         this.coversBucket = coversBucket;
         this.tracksBucket = tracksBucket;
         this.publicUrl = publicUrl;
     }
 
+    /* Return formatted file url */
     public String getFile(String bucket, String fileName)
     {
         return String.format("%s/%s/%s", publicUrl, bucket, fileName);
@@ -55,19 +50,11 @@ public class StorageService
         }
 
         String extension = fileService.extractExtension(file.getOriginalFilename());
-
         String fileKey = UUID.randomUUID() + extension;
 
         try
         {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileKey)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
+            storageClient.putObject(bucketName, fileKey, file.getInputStream(), file.getSize(), file.getContentType());
 
             return fileKey;
         }
@@ -82,6 +69,7 @@ public class StorageService
         return getFile(coversBucket, coverFileName);
     }
 
+    // TODO: IMMEDIATILY, SET-UP NORMAL MIGRATIONS TO LOGIC!!!
     public String uploadTrack(MultipartFile file)
             throws IOException
     {
@@ -89,9 +77,6 @@ public class StorageService
     }
 
     public String uploadTrackPicture(byte[] rawImage)
-            throws IOException,
-            ServerException, InsufficientDataException,
-            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
     {
         if (rawImage == null || rawImage.length == 0)
         {
@@ -100,14 +85,7 @@ public class StorageService
 
         String coverKey = UUID.randomUUID() + "-picture.jpg";
 
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(coversBucket)
-                        .object(coverKey)
-                        .stream(new ByteArrayInputStream(rawImage), rawImage.length, -1)
-                        .contentType("image/jpeg")
-                        .build()
-        );
+        storageClient.putObject(coversBucket, coverKey, new ByteArrayInputStream(rawImage), rawImage.length, "image/jpeg");
 
         return coverKey;
     }
@@ -117,25 +95,12 @@ public class StorageService
     ) throws PresignedUrlException {
         try
         {
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket(bucket)
-                            .object(fileName)
-                            .expiry(duration, timeUnit)
-                            .build()
-            );
+            return storageClient.getPresignedObjectUrl(bucket, fileName, duration, timeUnit);
         }
         catch (Exception e)
         {
             throw new PresignedUrlException("I could not generate the URL");
         }
-    }
-
-    public String getTrackPicturePresignedUrl(String coverFileName)
-            throws PresignedUrlException
-    {
-        return getPresignedUrl(coversBucket, coverFileName, TimeUnit.SECONDS, 5);
     }
 
     public String getTrackPresignedUrl(String trackFileName)
@@ -168,12 +133,7 @@ public class StorageService
 
         try
         {
-            minioClient.removeObject(
-                    RemoveObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .build()
-            );
+            storageClient.removeObject(bucketName, fileName);
         }
         catch (Exception e)
         {
@@ -185,22 +145,9 @@ public class StorageService
     {
         try
         {
-            StatObjectResponse stat = minioClient.statObject(
-                    StatObjectArgs.builder()
-                            .bucket(tracksBucket)
-                            .object(filePath)
-                            .build()
-            );
-            long trackSize = stat.size();
+            final long trackSize = (long) storageClient.statObject(tracksBucket, filePath).get("size");
 
-            InputStream inputStream = minioClient.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(tracksBucket)
-                            .object(filePath)
-                            .build()
-            );
-
-            return new InputStreamResource(inputStream)
+            return new InputStreamResource(storageClient.getObject(tracksBucket, filePath))
             {
                 @Override
                 public long contentLength()
