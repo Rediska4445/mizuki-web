@@ -16,6 +16,7 @@ import rf.mizuka.web.application.brokers.audio.AudioStreamProducer;
 import rf.mizuka.web.application.brokers.audio.events.TrackListenEvent;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
 import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.services.authors.AuthorService;
 import rf.mizuka.web.application.services.storage.StorageService;
 import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 import rf.mizuka.web.application.services.tracks.TrackService;
@@ -36,12 +37,14 @@ public class AudioController
 {
     private final AudioStreamProducer audioStreamProducer;
     private final TrackService trackService;
+    private final AuthorService authorService;
     private final StorageService storageService;
 
-    public AudioController(AudioStreamProducer audioStreamProducer, TrackService trackService, StorageService storageService)
+    public AudioController(AudioStreamProducer audioStreamProducer, TrackService trackService, AuthorService authorService, StorageService storageService)
     {
         this.audioStreamProducer = audioStreamProducer;
         this.trackService = trackService;
+        this.authorService = authorService;
         this.storageService = storageService;
     }
 
@@ -152,7 +155,7 @@ public class AudioController
             "title", track.getTitle(),
             "picturePath", storageService.getTrackPictureUrl(track.getPicturePath()),
             "color", (track.getColor() == null ? Color.WHITE : track.getColor()), // May be null
-            "author", trackService.joinAuthors(track.getAuthors())
+            "author", authorService.joinAuthors(track.getAuthors())
         ));
     }
 }

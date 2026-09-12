@@ -11,8 +11,9 @@ import java.time.Duration;
 @Service
 public final class AudioMetadataService
 {
-    /* Constant be defined default value, which returned and presentation for undefined duration
-     (from "convertDurationToString" method)
+    /*
+    Constant be defined default value, which returned and presentation for undefined duration
+    (from "convertDurationToString" method)
      */
     public static final String UNDEFINED_DURATION_PRESENT
             = "--:--";
