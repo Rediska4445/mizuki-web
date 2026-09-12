@@ -30,7 +30,7 @@ public class GlobalExceptionHandler
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentialsException(RuntimeException e)
+    public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException e)
     {
         log.error("exception by handleBadCredentialsException: ", e);
 
