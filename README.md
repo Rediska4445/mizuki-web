@@ -26,7 +26,6 @@ The exact feature set may evolve, so only the described core idea is reflected h
 | **Tests**    | Spring Boot test starter, Web MVC test starter, Data JPA test starter, Spring Security test |
 | **Utility**  | Lombok                                                                                      |
 | **Build**    | Maven, Maven Compiler Plugin, Spring Boot Maven Plugin                                      |
-                                   |
 
 ## Build configuration
 
@@ -54,3 +53,43 @@ If your IDE detects the Spring Boot project correctly, it usually creates the la
 3. Run the Spring Boot application from the generated artifact or with the Maven Spring Boot workflow.
 
 That is the standard Spring Boot flow for a Maven-based project created from Spring Initializr.
+
+---
+## Testing
+
+* **Run all tests:**
+  ```bash
+  ./mvnw test
+  ```
+
+* **Run a single specific test class:**
+  ```bash
+  ./mvnw test -Dtest=TrackRepositoryTest
+  ```
+
+* **Run a single specific test method:**
+  ```bash
+  ./mvnw test -Dtest=TrackRepositoryTest#testMethodName
+  ```
+
+* **Clean project and run all tests:**
+  ```bash
+  ./mvnw clean test
+  ```
+
+* **Build the project package skipping tests:**
+  ```bash
+  ./mvnw package -DskipTests
+  ```
+  
+---
+## Documentation
+  The project documentation is structured into the following formats:
+
+* **JavaDocs**: Technical documentation generated automatically from the source code comments.
+  * *To generate JavaDocs manually using JDK tool, run the following command in your terminal:*
+    ```bash
+    javadoc -d docs/javadoc -sourcepath src/main/java -subpackages rf.mizuka.web.application
+    ```
+* **Official Documentation**: Comprehensive user guides and system architecture overviews. *(Under development / Not available yet)*
+* **Wiki**: Collaborative knowledge base for developers and contributors. *(Under development / Not available yet)*
