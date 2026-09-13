@@ -1,5 +1,6 @@
 package rf.mizuka.web.application.services.storage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -23,7 +24,8 @@ public class StorageService
     private final String tracksBucket;
     private final String publicUrl;
 
-    public StorageService(FileService fileService, StorageClient storageClient,
+    public StorageService(FileService fileService,
+                          @Qualifier("storageClient") StorageClient storageClient,
                           @Value("${minio.buckets.covers}") String coversBucket,
                           @Value("${minio.buckets.tracks}") String tracksBucket,
                           @Value("${minio.public-url}") String publicUrl)

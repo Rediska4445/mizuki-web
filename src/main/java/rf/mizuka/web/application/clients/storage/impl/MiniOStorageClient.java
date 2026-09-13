@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-// TODO: Possible better forcing the creation of a constructor to explicitly specify the guarantee of a real client
 public final class MiniOStorageClient
         implements StorageClient
 {

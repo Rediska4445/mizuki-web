@@ -1,5 +1,7 @@
 package rf.mizuka.web.application.clients.storage;
 
+import org.springframework.stereotype.Component;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

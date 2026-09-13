@@ -7,6 +7,9 @@ import io.minio.SetBucketPolicyArgs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import rf.mizuka.web.application.clients.storage.StorageClient;
+import rf.mizuka.web.application.clients.storage.impl.MiniOStorageClient;
 
 @Configuration
 public class StorageConfig
@@ -22,7 +25,8 @@ public class StorageConfig
 
     /* Create storage client (miniO) and provide him like as spring bean*/
     @Bean
-    public MinioClient minioClient()
+    @Primary
+    public StorageClient storageClient()
             throws Exception
     {
         MinioClient client = MinioClient.builder()
@@ -76,6 +80,6 @@ public class StorageConfig
                         .build()
         );
 
-        return client;
+        return new MiniOStorageClient(client);
     }
 }
