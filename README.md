@@ -54,6 +54,31 @@ If your IDE detects the Spring Boot project correctly, it usually creates the la
 
 That is the standard Spring Boot flow for a Maven-based project created from Spring Initializr.
 
+### Docker
+
+The project uses the standard **Spring Boot Docker Compose support** for infrastructure management. All environment configurations are pre-defined in the `dockerfile` and `docker-compose.yml`.
+
+* **Prerequisites:** Make sure **Docker Desktop** is installed and running on your machine.
+
+* **Automatic Lifecycle:**
+  When you run the application via your IDE or Maven, Spring Boot will automatically detect the `docker-compose.yml` file, spin up the required containers (e.g., database), and shut them down when the application stops.
+
+* **Manual Management :**
+  If you prefer to manage the containers manually, use the following standard commands:
+  
+  * **Start containers in the background:**
+    ```bash
+    docker-compose up -d
+    ```
+  * **Stop and remove containers:**
+    ```bash
+    docker-compose down
+    ```
+  * **Rebuild the custom Docker image:**
+    ```bash
+    docker-compose up --build
+    ```
+
 ---
 ## Testing
 
