@@ -1,0 +1,62 @@
+[33m97839a3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m)[m edit: handleBadCredentialsException error message edited
+[33mfe42195[m add: handleBadCredentialsException logging added
+[33m08797e3[m add: handleAnyException method for catching any exception in service to GlobalExceptionHandler
+[33m0a50e4e[m add: logging to GlobalExceptionHandler
+[33m3062713[m redis and kafka injected
+[33m7da8782[m add: search front-end input and javascript function for fetch query
+[33mffc55cb[m tests: SecurityConfigTest reviewed
+[33m71e04b1[m ref: js audio player refactored
+[33m3ec298e[m fix: security config logout page fixed
+[33m7253a19[m ref: AudioController trackPage endpoint removed
+[33m62bd9bd[m 2 stage of fucking: AWS S3 (MiniO) injected
+[33m19d2e03[m 1 stage of fucking: postregsql and docker injected
+[33m51808a3[m refactor: longblob picture changed to path in storage
+[33mf4c8aab[m[33m ([m[1;31morigin/dev[m[33m)[m push
+[33mcb0ffe5[m refactor & documented
+[33m60fae64[m added: new tests for services
+[33m4996a3a[m refactor: auth forms
+[33m9094b12[m added: bottom-player to index (home) html
+[33m0e27cbe[m refactor: UserService
+[33m3a027df[m refactor: audio exceptions
+[33mcc932bf[m refactor: AudioMetadataService
+[33m7aa8497[m refactor: User entity
+[33m08c079c[m refactor: AuthController
+[33mc4b12eb[m refactor: HomeController
+[33mc16a61c[m edit: HomeController unlimited list tracks
+[33m9b9cc6f[m added: track/** matcher to security config
+[33ma358cdc[m added: logout
+[33me0aa92c[m refactor: TrackService
+[33m18f0e00[m added: existsByTitleAndExactAuthors to TrackService
+[33m5d408ec[m refactored: special logic for save track
+[33m33daae8[m added: get color from album art
+[33m4457b57[m added: encode picture into track to Base64
+[33ma71c28f[m added: searchTracks to TrackService
+[33m08c1392[m added: AudioService to TrackService
+[33mf4cf9aa[m refactor: remove unused imports
+[33m7f78c29[m RegisterForm now use Lombok
+[33mb7e3cea[m Added list tracks on home page get method
+[33md55e12d[m Added AudioMetadataService dependency to TrackService
+[33m7fa0546[m Added exception catching on upload track to server, which redirect exceptions on upper-level catching
+[33m2d52dfd[m Track.java refactored
+[33m85fed89[m Added metadata of audio file fields
+[33m4c631a1[m Added image picture field to Track data table entity
+[33m3ba9bb8[m Save track to server included to try-catch exception, and remove file on catch exception
+[33mc0fd1c6[m Added AudioMetadataService for extract metadata from audio files
+[33md0a9d2e[m Project was clean up of shit
+[33m5fa6255[m Workflows combined into one, and divided from each other into sequential tasks
+[33mc872f0e[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m README.md updated
+[33m9ab967f[m Create LICENSE
+[33m204f5b0[m Tests updates
+[33m14fa1ac[m CI refactored
+[33mc7169db[m CI added
+[33m5820aa5[m Fixed bug with unauthorized access to rest api in web
+[33m2294d16[m Update html forms view, add JavaDocs, add Tests
+[33m1813a84[m Fixed a redirect error to the REST API (when receiving an error != 401, a redirect occurred, but an error should have been returned).
+[33m6c3de81[m OAuth 2.0 authentication for REST API has been implemented.
+[33mb1d8bf6[m Package refactor
+[33m5e7079f[m The code is covered by basic tests
+[33mbdd26a4[m Added first basic test for check start application
+[33md9f496d[m A basic authentication system based on Spring Security has been implemented and the code has been documented.
+[33m71fb20f[m Added the ability to download and view tracks
+[33m7c6a1c4[m Added a template for authorization
+[33mb118f3a[m Updated git index

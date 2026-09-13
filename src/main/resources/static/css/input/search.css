@@ -1,0 +1,82 @@
+.search {
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    position: relative;
+}
+
+form {
+    width: 100%; /* Заставляет форму занять всю ширину родительского контейнера */
+}
+
+.search-from-group {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.search-from-group input[type="hidden"] {
+    display: none;
+}
+
+.search-from-group input[type="text"] {
+    flex: 1;
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    border: 2px solid #444;
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(16px);
+    letter-spacing: 0.3px;
+}
+
+.search-from-group input[type="text"]::placeholder {
+    color: #888;
+    font-weight: 400;
+}
+
+/* Hover */
+.search-from-group input[type="text"]:hover {
+    border-color: #666;
+    box-shadow:
+        0 12px 40px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+}
+
+.search-from-group input[type="text"]:focus {
+    outline: none;
+    border-color: #00d4ff;
+    box-shadow:
+        0 0 0 4px rgba(0,212,255,0.2),
+        0 16px 48px rgba(0,212,255,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+.search-from-group input:focus ~ ::after {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(0,212,255,0.5));
+}
+
+@media (max-width: 768px) {
+    .search {
+        margin: 0 1rem 1.5rem;
+        max-width: none;
+    }
+
+    .search-from-group input[type="text"] {
+        padding: 1.1rem 1.75rem;
+        font-size: 1.05rem;
+    }
+}
+
+.search-from-group input[type="text"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
