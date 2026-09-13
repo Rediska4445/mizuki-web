@@ -4,15 +4,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationListener;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import rf.mizuka.web.application.configurations.brokers.KafkaConfig;
 import rf.mizuka.web.application.controllers.auth.AuthController;
 import rf.mizuka.web.application.services.user.UserService;
 
@@ -25,17 +30,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(controllers = AuthController.class)
 public class AuthControllerTest
 {
     @Autowired
     private MockMvc mockMvc;
+
     @MockitoBean
     private UserService userService;
+
     @MockitoBean
     private AuthenticationManager authenticationManager;
+
     @MockitoBean
     private CacheManager cacheManager;
+
+    @MockitoBean
+    private KafkaConfig kafkaConfig;
+
+    @MockitoBean(name = "kafkaTemplate")
+    private org.springframework.context.ApplicationListener<?> fakeKafkaTemplate;
 
     @BeforeEach
     void setUp()
