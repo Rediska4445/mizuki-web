@@ -5,6 +5,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
 import org.springframework.stereotype.Service;
+import rf.mizuka.web.application.services.audio.metadata.AudioMetadataService;
 
 import java.io.IOException;
 
@@ -30,10 +31,13 @@ public final class AudioService
         long contentLength = resource.contentLength();
         HttpRange range = headers.getRange().stream().findFirst().orElse(null);
 
-        if (range != null) {
+        if (range != null)
+        {
             final long start = range.getRangeStart(contentLength);
             return new ResourceRegion(resource, start, Math.min(chunkSize, range.getRangeEnd(contentLength) - start + 1));
-        } else {
+        }
+        else
+        {
             return new ResourceRegion(resource, 0, Math.min(chunkSize, contentLength));
         }
     }

@@ -1,85 +1,32 @@
-class AudioFader
+export const fade = (fromVolume, toVolume, duration, onVolumeChange) =>
 {
-    /**
-     * @param {HTMLAudioElement} audio - Ссылка на аудио объект
-     * @param {number} duration - Длительность анимации в миллисекундах (по умолчанию 300мс)
-     */
-    constructor(audio, duration = 300)
+    return new Promise((resolve) =>
     {
-        this.audio = audio;
-        this.duration = duration;
-        this.intervalId = null;
-        this.targetVolume = 1.0;
-    }
+        const start = parseFloat(fromVolume);
+        const target = parseFloat(toVolume);
+        const startTime = performance.now();
+        const msDuration = duration * 1000;
 
-    /**
-     * Запоминает базовую громкость
-     * @param {number} vol - Значение от 0.0 до 1.0
-     */
-    setTargetVolume(vol)
-     {
-        this.targetVolume = Number(vol);
-        if (!this.intervalId)
+        onVolumeChange(start);
+
+        const animate = (currentTime) =>
         {
-            this.audio.volume = this.targetVolume;
-        }
-    }
+            const elapsed = currentTime - startTime;
 
-    /**
-     * Плавно запускает музыку с нарастанием звука
-     */
-    fadeIn()
-    {
-        clearInterval(this.intervalId);
-
-        if (this.audio.paused)
-        {
-            this.audio.volume = 0;
-            this.audio.play().catch(err => console.log("FadeIn play block:", err));
-        }
-
-        const steps = 20;
-        const stepTime = this.duration / steps;
-        const volumeStep = this.targetVolume / steps;
-
-        this.intervalId = setInterval(() =>
-        {
-            if (this.audio.volume + volumeStep >= this.targetVolume)
-             {
-                this.audio.volume = this.targetVolume;
-                clearInterval(this.intervalId);
-                this.intervalId = null;
-            } else
+            if (elapsed >= msDuration)
             {
-                this.audio.volume += volumeStep;
+                onVolumeChange(target);
+                resolve();
             }
-        }, stepTime);
-    }
-
-    /**
-     * Плавно глушит музыку и затем ставит на паузу
-     */
-    fadeOut()
-    {
-        clearInterval(this.intervalId);
-
-        if (this.audio.paused) return;
-
-        const steps = 20;
-        const stepTime = this.duration / steps;
-        const volumeStep = this.audio.volume / steps;
-
-        this.intervalId = setInterval(() =>
-        {
-            if (this.audio.volume - volumeStep <= 0.005)
+            else
             {
-                this.audio.volume = 0;
-                this.audio.pause();
-                clearInterval(this.intervalId);
-                this.intervalId = null;
-            } else {
-                this.audio.volume -= volumeStep;
+                const progress = elapsed / msDuration;
+                const currentVol = start + (target - start) * progress;
+                onVolumeChange(currentVol);
+                requestAnimationFrame(animate);
             }
-        }, stepTime);
-    }
-}
+        };
+
+        requestAnimationFrame(animate);
+    });
+};

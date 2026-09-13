@@ -1,8 +1,12 @@
 # Mizuki-Web
 
-Mizuki-Web is a project based on the idea of **[mizuki-player](https://github.com/Rediska4445/mizuki-player)** and created as a personal pet project for practical learning and gaining experience in Spring, Kafka, SQL, tests, Maven, and Git.   
+Mizuki-Web is a project based on the idea of **[mizuki-player](https://github.com/Rediska4445/mizuki-player)** and created as a personal pet project for practical learning and gaining experience in Spring, Kafka, Redis, Docker, S3, SQL (PostgreSQL/H2), tests, Maven, and Git.   
 It is a simple streaming platform for interacting with music, including downloading, uploading, listening, and other related features.  
 Spring Boot is commonly used to build production-grade applications with minimal setup.  
+
+> [!IMPORTANT]
+> **Educational Purpose Only**  
+> This project is not a consumer-grade product and is not intended for commercial sale or distribution (at least not without explicit attribution to the author). It is strictly an educational project designed for learning purposes and does not claim to be a production-ready application. It may, and likely will, contain numerous bugs, security flaws, performance issues, and incomplete features.
 
 ## About the project
 
@@ -12,26 +16,17 @@ The exact feature set may evolve, so only the described core idea is reflected h
 
 ## Technology stack
 
-| Area     | Technologies                                                                                |
-|----------|---------------------------------------------------------------------------------------------|
-| Tests    | Spring Boot test starter, Web MVC test starter, Data JPA test starter, Spring Security test |
-| Web      | Spring Web, Thymeleaf, Thymeleaf extras for Spring Security 6                               |
-| Security | Spring Security, OAuth2 resource server                                                     |
-| Database | Spring Data JPA, H2                                                                         |
-| Utility  | Lombok                                                                                      |
-| Build    | Maven, Maven Compiler Plugin, Spring Boot Maven Plugin                                      |
-
-## Maven setup
-
-| Part     | Description                                                                                                 |
-|----------|-------------------------------------------------------------------------------------------------------------|
-| Tests    | test dependencies for application, web layer, and security layer                                            |
-| Web      | dependencies for server-side web rendering and HTTP handling                                                |
-| Security | dependencies for authentication and authorization support                                                   |
-| Database | JPA for persistence and H2 for runtime database                                                             |
-| Build    | compiler plugin with Lombok annotation processing, Boot plugin with Lombok excluded from the final artifact |
-
-Lombok needs annotation processing during compilation, and the Maven setup should reflect that.
+| Area         | Technologies                                                                                |
+|:-------------|:--------------------------------------------------------------------------------------------|
+| **Web**      | Spring Web, Thymeleaf, Thymeleaf extras for Spring Security 6                               |
+| **Security** | Spring Security, OAuth2 resource server                                                     |
+| **Database** | Spring Data JPA, H2, PostgreSQL                                                             |
+| **Storage**  | S3 (MinIO)                                                                                  |
+| **DevOps**   | Docker, Docker Compose                                                                      |
+| **Tests**    | Spring Boot test starter, Web MVC test starter, Data JPA test starter, Spring Security test |
+| **Utility**  | Lombok                                                                                      |
+| **Build**    | Maven, Maven Compiler Plugin, Spring Boot Maven Plugin                                      |
+                                   |
 
 ## Build configuration
 

@@ -1,12 +1,21 @@
 package rf.mizuka.application.tracks.repository;
 
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
-import rf.mizuka.web.application.database.repository.TrackRepository;
+import rf.mizuka.web.application.database.repository.media.tracks.TrackRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,13 +23,29 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@Transactional
+@Rollback
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = "classpath:settings-test.properties")
 public class TrackRepositoryTest
 {
+    @MockitoBean
+    private CacheManager cacheManager;
+
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
     private TrackRepository trackRepository;
+
+    @BeforeEach
+    void setUp()
+    {
+        CacheManager realCacheManager = new ConcurrentMapCacheManager();
+
+        Mockito.when(cacheManager.getCache(Mockito.anyString()))
+                .thenAnswer(invocation -> realCacheManager.getCache(invocation.getArgument(0)));
+    }
 
     @Test
     void shouldSaveTrackWithGeneratedId()

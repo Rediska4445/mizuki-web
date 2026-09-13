@@ -20,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Test with Maven
-        run: mvn clean test -B
+        run: mvn clean test
 
   build:
     runs-on: windows-latest
@@ -36,4 +36,4 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests -B
+        run: mvn clean package -DskipTests

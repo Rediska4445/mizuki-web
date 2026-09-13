@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <head th:replace="~{fragments/super :: super-head}"></head>
+
+    <title>Mizuki | Sign up</title>
+    <link rel="stylesheet" th:href="@{/css/styles/auth/auth.css}" />
+</head>
+<body>
+<div class="container">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h1>Sign up</h1>
+      <p>Create account</p>
+    </header>
+
+    <div th:if="${registerError}" class="error-alert">
+      <span th:text="${registerError}"></span>
+    </div>
+
+    <form th:action="@{/auth/register}" th:object="${registerForm}" method="post" class="auth-form">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" th:field="*{username}" required />
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" th:field="*{password}" required />
+      </div>
+
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Sign up</button>
+    </form>
+
+    <div class="auth-footer">
+      <hr class="separator" />
+      <a th:href="@{/auth/login}" class="auth-link">Have an account? Sign in</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

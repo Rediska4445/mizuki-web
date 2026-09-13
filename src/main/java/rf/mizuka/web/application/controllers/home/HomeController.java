@@ -1,45 +1,51 @@
 package rf.mizuka.web.application.controllers.home;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import rf.mizuka.web.application.database.entities.user.User;
 import rf.mizuka.web.application.forms.home.TrackForm;
+import rf.mizuka.web.application.services.storage.StorageService;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.security.Principal;
 
+@Slf4j
 @Controller
 @RequestMapping("/")
-public final class HomeController
+public class HomeController
 {
+    private final StorageService storageService;
     private final TrackService trackService;
 
-    public HomeController(TrackService trackService)
-    {
+
+    public HomeController(
+            StorageService storageService,
+            TrackService trackService
+    ) {
+        this.storageService = storageService;
         this.trackService = trackService;
     }
 
     @GetMapping
-    public String tracks(
+    @Transactional(readOnly = true)
+    public String home(
+            @AuthenticationPrincipal User user,
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "0") int size,
-            Model model,
-            Principal principal
+            Principal principal,
+            Model model
     ) {
-        Page<TrackForm> tracks = trackService.searchTracks(query, size).map(
-                e -> new TrackForm(
-                        e,
-                        trackService.encodeBase64Picture(e),
-                        trackService.audioService().audioMetadataService().convertDurationToString(e.getDuration())
-                ));
+        Page<TrackForm> tracks = trackService.searchTracks(user, query, size);
 
-        String username = principal.getName().equals("default") ? "default" : principal.getName();
-
-        model.addAttribute("username", username);
         model.addAttribute("tracks", tracks.getContent());
+        model.addAttribute("username", principal.getName());
 
         return "home";
     }

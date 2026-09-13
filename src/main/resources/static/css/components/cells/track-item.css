@@ -1,0 +1,251 @@
+@import url('../../root.css');
+
+.track-item
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: transparent;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.track-main-content
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.track-title-wrapper
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    line-height: normal;
+}
+
+.track-item:hover
+{
+    background-color: rgba(51, 51, 51, 0.08);
+}
+
+/* Album art cover box styles */
+.track-cover-box
+{
+    border: 1.5px solid var(--track-color, #333333);
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    border-radius: 8px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Album art image cover box styles */
+.track-cover-img
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.track-cover-box:hover .track-cover-img
+{
+    filter: brightness(0.5);
+    transition: filter 0.2s ease;
+}
+
+/* Album art cover box button styles */
+.track-cover-box .track-item-player-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    border: none;
+    outline: none;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    transition: opacity 0.2s ease;
+}
+
+.track-cover-box .track-item-player-button svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: #ffffff;
+}
+
+.track-cover-box .track-item-player-button .icon-svg-play { display: block; }
+.track-cover-box .track-item-player-button .icon-svg-pause { display: none; }
+.track-cover-box .track-item-player-button.is-playing .icon-svg-play { display: none; }
+.track-cover-box .track-item-player-button.is-playing .icon-svg-pause { display: block; }
+
+.track-cover-box:hover .track-item-player-button,
+.track-cover-box .track-item-player-button.is-playing {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.track-cover-placeholder-icon
+{
+    color: #ffffff;
+    opacity: 0.7;
+}
+
+/* Track metadata styles */
+.track-meta-info
+{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.track-title-text
+{
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    line-height: normal;
+}
+
+.track-artist-text
+{
+    font-size: 0.8rem;
+    color: var(--track-artist-color, #666666);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.track-duration-box
+{
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--track-duration-color);
+    display: flex;
+    align-items: center;
+    line-height: 13px;
+    margin: 0;
+}
+
+/* Left block in meta info */
+.track-left-box-wrapper
+{
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: 100%;
+
+    /* Stats */
+    .track-stats-column
+    {
+        color: var(--track-plays-count-color);
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+
+        /* Text inside */
+        .track-plays-count-text
+        {
+            font-weight: 500;
+            line-height: 1;
+            display: inline-block;
+        }
+    }
+
+    .track-like-button
+    {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--track-heart-default, #8a8a93);
+        transition: transform 0.2s ease, color 0.2s ease;
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+
+        .heart-icon
+        {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            display: block;
+            transition: fill 0.15s ease, stroke 0.15s ease;
+        }
+
+         &:hover
+         {
+            color: var(--track-like-button-color, #18181b);
+
+            .heart-icon
+            {
+                fill: none;
+            }
+        }
+
+        &.active
+        {
+            color: var(--track-like-button-color, #18181b);
+
+            .heart-icon
+            {
+                fill: var(--track-like-button-color, #18181b);
+            }
+
+            &:hover
+             {
+                opacity: 0.8;
+            }
+        }
+    }
+}

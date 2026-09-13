@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <header th:fragment="main-header" class="hero-section">
+        <script th:src="@{/js/scripts/home/header/user-menu.js}" type="module" defer></script>
+        <script th:src="@{/js/scripts/home/header/header.js}" type="module" defer></script>
+        <script th:src="@{/js/playlist/service/track-service.js}" type="module" defer></script>
+
+        <link th:href="@{/css/styles/home/header.css}" rel="stylesheet">
+
+        <div class="left-hero-section">
+            <a href="/" class="hero-content" aria-label="On top">
+                <h1 class="hero-title">Mizuki</h1>
+                <p class="hero-subtitle">Ebanina Std.</p>
+            </a>
+        </div>
+
+        <div class="search-bar-container">
+            <link th:href="@{/css/components/input/search-text-input.css}" rel="stylesheet">
+
+            <form th:action="@{/search}" method="get" class="search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="search" name="query" placeholder="Type something" class="search-input" aria-label="Search">
+                </div>
+            </form>
+        </div>
+
+        <div class="right-hero-section">
+            <link th:href="@{/css/components/buttons/user-menu-button.css}" rel="stylesheet">
+            <link th:href="@{/css/components/forms/user-menu.css}" rel="stylesheet">
+
+            <div class="user-menu-wrapper">
+                <button class="user-profile-bar" aria-label="Profile">
+                    <span class="user-name" th:text="${username}">You</span>
+                    <div class="user-avatar-circle">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </button>
+
+                <div class="user-actions-dropdown">
+                    <form th:action="@{/tracks/upload}" method="get" class="inline-form">
+                        <button type="submit" class="dropdown-action-btn secondary-action">Upload</button>
+                    </form>
+                    <form th:action="@{/auth/logout}" method="post" class="inline-form">
+                        <button type="submit" class="dropdown-action-btn primary-action">Sign out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

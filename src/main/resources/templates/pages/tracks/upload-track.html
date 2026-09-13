@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/super :: super-head}"></th:block>
+
+    <link th:href="@{/css/styles/tracks/track-upload.css}" rel="stylesheet" >
+
+    <title>Upload</title>
+</head>
+
+<body hx-boost="true" hx-ext="head-support">
+    <script th:src="@{/js/scripts/tracks/tracks-upload.js}" type="module" defer></script>
+
+    <main id="main-content">
+        <div class="upload-section">
+            <form th:action="@{/tracks/upload}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="upload-form"
+                  hx-disable>
+                <h2>Upload your idea</h2>
+
+                <hr class="header-separator">
+                <div class="media-upload-container">
+                    <div class="dropzone-wrapper cover-zone">
+                        <label for="coverFile" class="dropzone-label">
+                            <div class="dropzone-preview" id="coverPreview">
+                                <img id="cover" class="cover-preview-img" src="" alt="Preview"/>
+
+                                <span class="text">Upload album art</span>
+                            </div>
+                            <input type="file" id="coverFile" name="cover" accept="image/jpeg, image/png"/>
+                        </label>
+                    </div>
+
+                    <div class="dropzone-wrapper audio-zone">
+                        <label for="audioFile" class="dropzone-label">
+                            <div class="dropzone-preview" id="audioPreview">
+                                <span class="text" id="audioText">Upload audio file</span>
+                            </div>
+                            <input type="file" id="audioFile" name="audio" accept="audio/mpeg, audio/wav"/>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="styled-separator">
+                    <span>Metadata</span>
+                </div>
+
+                <div class="metadata-container">
+                    <div class="input-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" placeholder="My idea" required />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="artist">Author</label>
+                        <input type="text" id="artist" name="artist" placeholder="Me" required />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="duration">Duration (seconds)</label>
+                        <input type="text" id="duration" name="duration" placeholder="e.g. 180" required />
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="explicit" name="explicit" value="true">
+                            <span>Explicit</span>
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="header-separator">
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Publish</button>
+                </div>
+            </form>
+
+            <hr class="header-separator-back-btn">
+            <a th:href="@{/}" class="back-btn">Return</a>
+        </div>
+    </main>
+
+    <footer id="global-audio-player" hx-preserve="true">
+        <div th:replace="~{fragments/player/global-bottom-player :: bottom-player}"></div>
+    </footer>
+</body>
+</html>

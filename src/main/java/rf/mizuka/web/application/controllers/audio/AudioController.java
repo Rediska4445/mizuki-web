@@ -1,72 +1,128 @@
 package rf.mizuka.web.application.controllers.audio;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.core.io.FileSystemResource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import rf.mizuka.web.application.database.entities.media.authors.Author;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import rf.mizuka.io.AudioInputStream;
+import rf.mizuka.web.application.brokers.audio.AudioStreamProducer;
+import rf.mizuka.web.application.brokers.audio.events.TrackListenEvent;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
+import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.services.authors.AuthorService;
+import rf.mizuka.web.application.services.storage.StorageService;
+import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 import rf.mizuka.web.application.services.tracks.TrackService;
 
 import java.awt.*;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static rf.mizuka.utilities.AudioUtilities.getResourceRegion;
+
+@Slf4j
 @Controller
-@RequestMapping("/track")
+@RequestMapping("/audio")
 public class AudioController
 {
+    private final AudioStreamProducer audioStreamProducer;
     private final TrackService trackService;
+    private final AuthorService authorService;
+    private final StorageService storageService;
 
-    public AudioController(TrackService trackService)
+    public AudioController(AudioStreamProducer audioStreamProducer, TrackService trackService, AuthorService authorService, StorageService storageService)
     {
+        this.audioStreamProducer = audioStreamProducer;
         this.trackService = trackService;
-    }
-
-    @GetMapping(value = "/{id}", produces = "text/html")
-    public String trackPage(@PathVariable Long id, Model model)
-    {
-        final Optional<Track> track = trackService.trackRepository().findById(id);
-        if(track.isEmpty())
-            model.addAttribute("error", String.format("Track with request id (%d) is not exist!", id));
-        else
-            model.addAttribute("track", track);
-
-        return "app/tracks/track";
+        this.authorService = authorService;
+        this.storageService = storageService;
     }
 
     @ResponseBody
-    @GetMapping(value = "/stream/{id}", produces = "audio/mpeg")
-    public ResponseEntity<ResourceRegion> streamAudio(
-            @PathVariable Long id,
+    @GetMapping(value = "/stream/{trackId}")
+    public void streamAudio(
+            @PathVariable Long trackId,
             @RequestHeader HttpHeaders headers,
-            jakarta.servlet.http.HttpSession session
-    ) throws IOException {
-        final Optional<Track> idTrack = trackService.trackRepository().findById(id);
+            jakarta.servlet.http.HttpSession session,
+            HttpServletResponse response
+    ) throws PresignedUrlException, IOException {
+        final Optional<Track> idTrack
+                = trackService.trackRepository().findById(trackId);
 
         if(idTrack.isEmpty())
-            return ResponseEntity.notFound().build();
+        {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
 
-        Resource audioFile = new FileSystemResource(Paths.get(idTrack.get().getFilePath()));
-        if (!audioFile.exists())
-            return ResponseEntity.notFound().build();
+        session.setAttribute("currentTrackId", trackId);
 
-        session.setAttribute("currentTrackId", id);
+        Resource audioResource = storageService.getTrackResource(idTrack.get().getFilePath());
+        ResourceRegion region = getResourceRegion(audioResource, headers);
 
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                .contentType(MediaType.valueOf("audio/mpeg"))
-                .body(trackService.audioService().resourceRegion(audioFile, headers));
+        response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+
+        long start = region.getPosition();
+        long length = region.getCount();
+        long end = start + length - 1;
+        long totalLength = audioResource.contentLength();
+
+        response.setContentType("audio/mpeg");
+
+        if (headers.getRange().isEmpty())
+        {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(totalLength));
+            return;
+        }
+        else
+        {
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + totalLength);
+            response.setHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+        }
+
+        try (InputStream chunkedStream
+                     = new AudioInputStream(audioResource.getInputStream(), start, length);
+             OutputStream outputStream
+                     = response.getOutputStream())
+        {
+            chunkedStream.transferTo(outputStream);
+            outputStream.flush();
+        }
+        catch (AsyncRequestNotUsableException | ClientAbortException e)
+        {
+            log.warn(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping(value = "/stream/{trackId}/complete")
+    public void completeStreamAudio(
+            @PathVariable Long trackId,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        audioStreamProducer.logTrackListen(TrackListenEvent.builder()
+                .userId(currentUser.getId())
+                .trackId(trackId)
+                .build()
+        );
     }
 
     @GetMapping("/{trackId}")
     public ResponseEntity<?> getTrack(@PathVariable Long trackId)
+            throws PresignedUrlException
     {
         if (trackId == null)
         {
@@ -79,56 +135,27 @@ public class AudioController
             return ResponseEntity.ok(Map.of("active", false));
         }
 
-        Track track = trackOpt.get();
-
-        String base64Picture = trackService.encodeBase64Picture(track);
-        String coverSrc = (base64Picture != null && !base64Picture.isEmpty())
-                ? "data:image/jpeg;base64," + base64Picture
-                : "/img/logo-hd.png";
-
-        return ResponseEntity.ok(Map.of(
-                "active", true,
-                "trackId", track.getId().toString(),
-                "title", track.getTitle(),
-                "color", track.getColor() == null ? Color.WHITE : track.getColor(), // May be null
-                "cover", coverSrc,
-                "author", String.join(",",  track.getAuthors().stream()
-                        .map(Author::getName)
-                        .collect(Collectors.joining(","))
-                )));
+        return buildTrackApiAnswer(trackOpt.get());
     }
 
     @GetMapping("/current")
     public ResponseEntity<?> getCurrentTrack(HttpSession session)
+            throws PresignedUrlException
     {
-        Long trackId = (Long) session.getAttribute("currentTrackId");
-        if (trackId == null)
-        {
-            return ResponseEntity.ok(Map.of("active", false));
-        }
+        return getTrack((Long) session.getAttribute("currentTrackId"));
+    }
 
-        Optional<Track> trackOpt = trackService.trackRepository().findById(trackId);
-        if (trackOpt.isEmpty())
-        {
-            return ResponseEntity.ok(Map.of("active", false));
-        }
-
-        Track track = trackOpt.get();
-
-        String base64Picture = trackService.encodeBase64Picture(track);
-        String coverSrc = (base64Picture != null && !base64Picture.isEmpty())
-                ? "data:image/jpeg;base64," + base64Picture
-                : "/img/logo-hd.png";
-
+    private ResponseEntity<?> buildTrackApiAnswer(Track track)
+            throws PresignedUrlException
+    {
         return ResponseEntity.ok(Map.of(
-                "active", true,
-                "trackId", track.getId().toString(),
-                "title", track.getTitle(),
-                "color", track.getColor() == null ? Color.WHITE : track.getColor(), // May be null
-                "cover", coverSrc,
-                "author", String.join(",",  track.getAuthors().stream()
-                        .map(Author::getName)
-                        .collect(Collectors.joining(","))
-                )));
+            "active", true,
+            "trackId", track.getId().toString(),
+            "trackPath", storageService.getTrackPresignedUrl(track.getFilePath()),
+            "title", track.getTitle(),
+            "picturePath", storageService.getTrackPictureUrl(track.getPicturePath()),
+            "color", (track.getColor() == null ? Color.WHITE : track.getColor()), // May be null
+            "author", authorService.joinAuthors(track.getAuthors())
+        ));
     }
 }

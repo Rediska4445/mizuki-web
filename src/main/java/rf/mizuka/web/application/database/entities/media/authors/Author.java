@@ -8,7 +8,6 @@ import rf.mizuka.web.application.database.entities.user.User;
 @Entity
 @Getter
 @Setter
-@ToString
 @Table(name = "authors")
 @AllArgsConstructor
 public class Author
@@ -24,7 +23,8 @@ public class Author
     @Column(nullable = false, length = 64, unique = true)
     private String name;
 
-    public Author(String name) {
+    public Author(String name)
+    {
         this.name = name;
     }
 

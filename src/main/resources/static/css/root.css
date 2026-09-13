@@ -1,0 +1,25 @@
+:root
+{
+    --bg-main: #f0f3f6;
+    --bg-input: #ffffff;
+    --text-primary: #111111;
+    --text-primary-dark: #333333;
+    --text-secondary: #7a828a;
+    --border-color: #e2e8f0;
+    --accent-dark: #111111;
+    --accent-text: #ffffff;
+    --radius-pill: 25px;
+    --radius-block: 16px;
+    --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.track-item
+{
+    --track-plays-count-color: #636366;
+    --track-duration-color: #636366;
+    --track-title-color: #666666;
+    --track-artist-color: #666666;
+    --track-heart-default: #a1a1aa;
+    --track-heart-hover: #18181b;
+    --track-heart-active: #18181b;
+}

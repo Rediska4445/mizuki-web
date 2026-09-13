@@ -1,6 +1,5 @@
 package rf.mizuka.web.application.controllers.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,18 +17,21 @@ import rf.mizuka.web.application.forms.auth.RegisterForm;
 @RequestMapping("/auth")
 public final class AuthController
 {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public AuthController(UserService userService, AuthenticationManager authenticationManager)
+    {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+    }
 
     @GetMapping("/login")
     public String auth(Model model)
     {
         model.addAttribute("loginForm", new LoginForm());
 
-        return "auth/login";
+        return "pages/auth/login";
     }
 
     @GetMapping("/register")
@@ -37,7 +39,7 @@ public final class AuthController
     {
         model.addAttribute("registerForm", new RegisterForm());
 
-        return "auth/register";
+        return "pages/auth/register";
     }
 
     @PostMapping("/login")
@@ -62,7 +64,7 @@ public final class AuthController
             model.addAttribute("loginError", "Invalid entered data.");
             model.addAttribute("loginForm", loginForm);
 
-            return "auth/login";
+            return "pages/auth/login";
         }
     }
 
@@ -76,7 +78,7 @@ public final class AuthController
             if (!registerForm.getPassword().equals(registerForm.getConfirmPassword()))
             {
                 model.addAttribute("registerError", "Passwords do not match.");
-                return "auth/register";
+                return "pages/auth/register";
             }
 
             userService.registerUser(registerForm.getUsername(), registerForm.getPassword());
@@ -87,7 +89,7 @@ public final class AuthController
         {
             model.addAttribute("registerError", "Incorrect entered data.");
 
-            return "auth/register";
+            return "pages/auth/register";
         }
     }
 }

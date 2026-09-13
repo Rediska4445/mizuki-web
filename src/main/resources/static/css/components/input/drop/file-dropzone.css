@@ -1,0 +1,94 @@
+.media-upload-container {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.cover-zone {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    box-sizing: border-box;
+}
+
+.audio-zone {
+    position: relative;
+    height: 180px;
+    box-sizing: border-box;
+}
+
+.dropzone-wrapper {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-block);
+    transition: border-color 0.3s;
+    background-color: var(--bg-input);
+    overflow: hidden;
+}
+
+.dropzone-wrapper:hover {
+    border-color: var(--accent-dark);
+}
+
+.dropzone-label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.dropzone-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-stack);
+    position: relative;
+}
+
+.dropzone-preview .icon,
+.dropzone-preview .text {
+    transition: opacity 0.2s;
+}
+
+.dropzone-preview.has-image .icon,
+.dropzone-preview.has-image .text {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preview-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius-block) - 2px);
+    z-index: 1;
+}
+
+.dropzone-preview .icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.dropzone-preview .text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.dropzone-wrapper input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}

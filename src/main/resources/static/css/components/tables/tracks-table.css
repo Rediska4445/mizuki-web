@@ -1,0 +1,57 @@
+.tracks-list-container {
+    display: block !important;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 30px auto 0 auto !important;
+    background: transparent;
+    border: 1.25px solid transparent;
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+}
+
+.empty-state-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.empty-state-text {
+    font-size: 1.1rem;
+    color: #666666;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.empty-state-text span {
+    font-weight: 700;
+    color: #333333;
+}
+
+/* Play button styles */
+.track-item, tr, td {
+    position: relative;
+}
+
+.track-item-player_button {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, scale 0.1s ease;
+    pointer-events: none;
+}
+
+.track-item:hover .track-item-player_button,
+tr:hover .track-item-player_button,
+td:hover .track-item-player_button {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}

@@ -1,106 +1,187 @@
 package rf.mizuka.web.application.services.tracks;
 
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import rf.mizuka.utilities.color.Colorizier;
+import rf.mizuka.web.application.brokers.BaseEvent;
+import rf.mizuka.web.application.brokers.audio.events.TrackListenEvent;
+import rf.mizuka.web.application.brokers.tracks.events.TrackLikeEvent;
 import rf.mizuka.web.application.database.entities.media.authors.Author;
 import rf.mizuka.web.application.database.entities.media.tracks.Track;
-import rf.mizuka.web.application.database.repository.AuthorRepository;
-import rf.mizuka.web.application.database.repository.TrackRepository;
-import rf.mizuka.web.application.services.audio.AudioMetadataService;
+import rf.mizuka.web.application.database.entities.user.User;
+import rf.mizuka.web.application.database.repository.media.authors.AuthorRepository;
+import rf.mizuka.web.application.database.repository.media.tracks.TrackRepository;
+import rf.mizuka.web.application.database.repository.user.UserRepository;
+import rf.mizuka.web.application.forms.home.TrackForm;
 import rf.mizuka.web.application.services.audio.AudioService;
+import rf.mizuka.web.application.services.audio.metadata.IAudioMetadata;
+import rf.mizuka.web.application.services.audio.metadata.exceptions.InvalidAudioDurationException;
 import rf.mizuka.web.application.services.color.ColorService;
+import rf.mizuka.web.application.services.image.ImageService;
+import rf.mizuka.web.application.services.storage.StorageService;
+import rf.mizuka.web.application.services.tracks.exceptions.TrackAlreadyExist;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class TrackService
 {
-    @Value("${storage.uploads.tracks.location}")
-    private String storageLocation;
-
+    /* Dependency */
+    private final ImageService imageService;
     private final AudioService audioService;
+    private final ColorService colorService;
+    private final StorageService storageService;
+
+    private final UserRepository userRepository;
     private final TrackRepository trackRepository;
     private final AuthorRepository authorRepository;
-    private final ColorService colorService;
 
-    public TrackService(AudioService audioService, TrackRepository trackRepository, AuthorRepository authorRepository, ColorService colorService)
-    {
+    /*
+     * Constant define the type of audio transfer
+     * True: Use "/stream/{id}" endpoint, which return byte stream audio
+     * False: Use "/{trackId}" endpoint, which return url to audio-file into storage
+     * */
+    @Getter
+    private final boolean isStreamingAudio;
+
+    public TrackService(
+            ImageService imageService, AudioService audioService,
+            TrackRepository trackRepository, AuthorRepository authorRepository,
+            ColorService colorService, StorageService storageService,
+            UserRepository userRepository,
+            @Value("${mizuki.audio.stream}") Boolean isStreamingAudio
+    ) {
+        this.imageService = imageService;
         this.audioService = audioService;
         this.trackRepository = trackRepository;
         this.authorRepository = authorRepository;
         this.colorService = colorService;
+        this.storageService = storageService;
+        this.userRepository = userRepository;
+        this.isStreamingAudio = isStreamingAudio;
     }
 
+    /* Straight access to inside dependency outta service */
     public AudioService audioService()
     {
         return audioService;
     }
 
-    public TrackRepository trackRepository() {
+    public TrackRepository trackRepository()
+    {
         return trackRepository;
     }
 
-    public Page<Track> searchTracks(String query, int size)
+    @org.springframework.transaction.annotation.Transactional(
+            rollbackFor = Exception.class
+    )
+    public void saveAggregatedListens(List<? extends BaseEvent<String>> records)
     {
-        return trackRepository.findByNameContaining(query, size <= 0 ? Pageable.unpaged() : Pageable.ofSize(size));
+        Map<Long, Long> aggregatedMap = records.stream()
+                .filter(TrackListenEvent.class::isInstance)
+                .map(TrackListenEvent.class::cast)
+                .filter(event -> event.getTrackId() != null)
+                .collect(Collectors.groupingBy(
+                        TrackListenEvent::getTrackId,
+                        Collectors.counting()
+                ));
+
+        aggregatedMap.forEach(trackRepository::addListenCount);
     }
 
-    /**
-     * Overdrive method, which return {@link #encodeBase64Picture(byte[])}
-     *
-     * @param track the track entity
-     * @return Base64 format encoded picture, or null
-     */
-    public String encodeBase64Picture(Track track)
+    @org.springframework.transaction.annotation.Transactional(
+            rollbackFor = Exception.class
+    )
+    public void saveAggregatedLikes(List<TrackLikeEvent> records)
     {
-        return encodeBase64Picture(track.getPicture());
-    }
+        // Stages of transaction
+        // 1. Update like count in track
+        Map<Long, Long> trackChanges = records.stream()
+                .collect(Collectors.groupingBy(
+                        TrackLikeEvent::getTrackId,
+                        Collectors.summingLong(e -> e.isLike() ? 1L : -1L)
+                ));
 
-    /**
-     * Method for encode picture to web format.
-     * <p>
-     * Examples of behavior:
-     * <pre>{@code
-     * // 1. Standard behavior with valid data:
-     * byte[] input = new byte[] { 65, 66, 67 }; // String "ABC"
-     * encodeBase64Picture(input);
-     * // Returns: "QUJD"
-     *
-     * // 2. Handling an empty array:
-     * byte[] input = new byte[0];
-     * encodeBase64Picture(input);
-     * // Returns: null
-     *
-     * // 3. Handling a null reference:
-     * encodeBase64Picture(null);
-     * // Returns: null
-     * }</pre>
-     *
-     * @param picture byte array, which mean the picture in raw view
-     * @return Base64 format encoded picture, null, if picture null or length &lt; 0
-     */
-    public String encodeBase64Picture(byte[] picture)
-    {
-        if (picture != null && picture.length > 0)
+        List<Long> sortedTrackIds = trackChanges.keySet().stream()
+                .sorted()
+                .toList();
+
+        for (Long trackId : sortedTrackIds)
         {
-            return java.util.Base64.getEncoder().encodeToString(picture);
+            Long delta = trackChanges.get(trackId);
+            if (delta != 0)
+            {
+                trackRepository.addTrackLikes(trackId, delta);
+            }
         }
 
-        return null;
+        // 2. Update liked track for user
+        Map<Long, List<TrackLikeEvent>> userEventsMap = records.stream()
+                .collect(Collectors.groupingBy(TrackLikeEvent::getUserId));
+
+        List<Long> sortedUserIds = userEventsMap.keySet().stream()
+                .sorted()
+                .toList();
+
+        for (Long userId : sortedUserIds)
+        {
+            List<TrackLikeEvent> userRecords = userEventsMap.get(userId);
+
+            for (TrackLikeEvent event : userRecords)
+            {
+                if (event.isLike())
+                {
+                    userRepository.insertLike(userId, event.getTrackId());
+                }
+                else
+                {
+                    userRepository.deleteLike(userId, event.getTrackId());
+                }
+            }
+        }
+    }
+
+    @org.springframework.transaction.annotation.Transactional(
+            readOnly = true
+    )
+    public Page<Track> searchTracks(String query, int size)
+    {
+        Page<Track> trackPage = trackRepository.searchTracks(
+                query, size <= 0 ? Pageable.unpaged() : Pageable.ofSize(size)
+        );
+
+        return trackPage;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(
+            readOnly = true
+    )
+    public Page<TrackForm> searchTracks(User user, String query, int size)
+    {
+        List<Long> likedTrackIds = userRepository.findLikedTrackIdsByUserId(user.getId());
+
+        Page<TrackForm> tracks = searchTracks(query, size).map(
+        e -> TrackForm.of(
+                e,
+                isStreamingAudio ? "/audio/stream/" + e.getId() : storageService.getTrackUrl(e.getFilePath()),
+                storageService.getTrackPictureUrl(e.getPicturePath()),
+                audioService.audioMetadataService().convertDurationToString(e.getDuration()),
+                likedTrackIds.contains(e.getId())
+        ));
+
+        return tracks;
     }
 
     /**
@@ -124,86 +205,98 @@ public class TrackService
      * findMostContrastingColor(null);
      * // Returns: null
      * }</pre>
-     * @param   track
-     *          the track to extract picture and after detect color
+     * @param   raw
+     *          the byte array of picture to extract picture and after detect color
      * @return color in HEX format
      * **/
-    public String getColorFromAlbumArt(Track track)
+    @org.springframework.transaction.annotation.Transactional(
+            readOnly = true
+    )
+    public Color getColorFromAlbumArt(byte[] raw)
             throws IOException
     {
-        return Colorizier.convertColorToHex(
-                colorService.findMostContrastingColor(ImageIO.read(new ByteArrayInputStream(track.getPicture())))
-        );
+        return colorService.calculateMainColorFromImage(ImageIO.read(
+                new ByteArrayInputStream(raw)
+        ));
+    }
+
+    private String getHexColorFromImage(byte[] raw)
+            throws IOException
+    {
+        return colorService.convertColorToHex(getColorFromAlbumArt(raw));
     }
 
     @Transactional(rollbackOn = Exception.class)
     public Track saveTrack(Track track, MultipartFile file)
             throws Exception
     {
-        String originalFilename = file.getOriginalFilename();
+        return saveTrack(track, null, file);
+    }
 
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains("."))
-        {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
+    @Transactional(rollbackOn = Exception.class)
+    public Track saveTrack(Track track, MultipartFile cover, MultipartFile file)
+            throws Exception
+    {
+        if(file == null || file.isEmpty())
+            throw new IllegalArgumentException("file is must be non-null and not be empty");
+        if(track == null)
+            throw new IllegalArgumentException("track is must be non-null");
 
-        String technicalName = UUID.randomUUID() + extension;
-        Path targetPath = Paths.get(storageLocation).resolve(technicalName);
+        // Upload track to file storage (AWS S3)
+        String audioKey
+                = storageService.uploadTrack(file);
+        // Picture key for upload
+        String audioPictureKey
+                = null;
 
-        if (Files.notExists(targetPath.getParent()))
-        {
-            Files.createDirectories(targetPath.getParent());
-        }
-
-        Files.copy(file.getInputStream(), targetPath);
-
-        if(track.getName() == null)
-            track.setName(originalFilename);
-        if(track.getFilePath() == null)
-            track.setFilePath(targetPath.toString());
+        // Set file to DB from file storage (in key view, not really path or URL)
+        track.setFilePath(audioKey);
+        track.setName(file.getName());
 
         try
         {
-            AudioMetadataService.Metadata meta;
+            IAudioMetadata.Metadata meta = new IAudioMetadata.Metadata(
+                    track.getTitle(),
+                    track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()),
+                    track.getDuration(),
+                    cover == null ? imageService.getDefaultMusicImage() : cover.getBytes()
+            );
 
-            // Check on exist metadata into track
-            if(track.getTitle() != null
-                    && track.getAuthors() != null
-                    && track.getDuration() != null)
-            {
-                 meta = new AudioMetadataService.Metadata(
-                        track.getTitle(), track.getAuthors().stream().map(Author::getName).collect(Collectors.toSet()), track.getDuration(), null
-                );
-            }
-            else
-            {
-                meta = audioService.audioMetadataService().extractMetadata(track);
-            }
-
+            // Collection authors to Author type collection
             // Immediately call before check on exist.
-            Set<Author> authors = meta.authors().stream()
+            Set<Author> authors = meta.authors()
+                    .stream()
                     .map(authorRepository::buildOrGet)
                     .collect(Collectors.toSet());
 
+            // If this track already exist
             if (existsByTitleAndExactAuthors(meta.title(), authors))
-            {
                 throw new TrackAlreadyExist("Track by these authors must be unique!");
-            }
 
+            // Main ease metadata for track
             track.setTitle(meta.title());
-            track.setAuthors(authors);
             track.setDuration(meta.Duration());
-            track.setPicture(meta.rawImage());
+            track.setAuthors(authors);
+
+            if(track.getDuration().toSeconds() < 0)
+                throw new InvalidAudioDurationException("audio duration less than 0");
+
+            // Save picture to file storage
+            track.setPicturePath(
+                    audioPictureKey = storageService.uploadTrackPicture(meta.rawImage())
+            );
 
             if(track.getColor() == null)
-                track.setColor(getColorFromAlbumArt(track));
+                track.setColor(getHexColorFromImage(meta.rawImage()));
 
             return trackRepository.save(track);
         }
         catch (Exception e)
         {
-            Files.deleteIfExists(targetPath);
+            storageService.deleteTrack(audioKey);
+
+            if(audioPictureKey != null)
+                storageService.deletePicture(audioPictureKey);
 
             throw e;
         }
@@ -219,9 +312,7 @@ public class TrackService
     public boolean existsByTitleAndExactAuthors(String title, Set<Author> targetAuthors)
     {
         if (targetAuthors == null || targetAuthors.isEmpty())
-        {
             return false;
-        }
 
         return trackRepository.findTracksByTitleAndFirstAuthor(title, targetAuthors.iterator().next().getName()).stream()
                 .anyMatch(track -> track.getAuthors().stream()

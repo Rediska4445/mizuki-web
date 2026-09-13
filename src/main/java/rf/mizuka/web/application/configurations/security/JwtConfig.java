@@ -1,0 +1,43 @@
+package rf.mizuka.web.application.configurations.security;
+
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import rf.mizuka.web.application.managers.KeyManager;
+
+@Configuration
+public class JwtConfig
+{
+    private final KeyManager keyManager;
+
+    public JwtConfig(KeyManager keyManager)
+    {
+        this.keyManager = keyManager;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder()
+            throws Exception
+    {
+        return NimbusJwtDecoder.withPublicKey(keyManager.getPublicKey()).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder()
+            throws Exception
+    {
+        return new NimbusJwtEncoder(
+                new ImmutableJWKSet<>(new JWKSet(
+                        new RSAKey.Builder(keyManager.getPublicKey())
+                                .privateKey(keyManager.getPrivateKey())
+                                .build()
+                ))
+        );
+    }
+}

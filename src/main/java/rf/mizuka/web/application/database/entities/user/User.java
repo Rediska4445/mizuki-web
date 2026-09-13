@@ -1,15 +1,20 @@
 package rf.mizuka.web.application.database.entities.user;
 
+import com.google.common.base.Objects;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import rf.mizuka.web.application.database.entities.media.tracks.Track;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 @Entity
+@AllArgsConstructor
 @Table(name = "users")
 public class User
     implements UserDetails
@@ -25,18 +30,34 @@ public class User
     @Column(nullable = false)
     private String password;
 
+    @Getter
+    @ManyToMany(
+            cascade =
+            {
+                CascadeType.PERSIST,
+                CascadeType.MERGE
+            },
+            fetch = FetchType.LAZY
+    )
+    @JoinTable(
+            name = "user_liked_tracks",
+            joinColumns = @JoinColumn(
+                    name = "user_id",
+                    foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE")
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "track_id",
+                    foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE")
+            )
+    )
+    private Set<Track> likedTracks;
+
     public User() {}
 
     public User(String username, String password)
     {
         this.username = username;
         this.password = password;
-    }
-
-    public User setId(long id)
-    {
-        this.id = id;
-        return this;
     }
 
     @Override
@@ -91,5 +112,30 @@ public class User
     {
         this.password = password;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        User user = (User) o;
+
+        return Objects.equal(id, user.id) && Objects.equal(username, user.username);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(id, username);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "User{" +
+                "id=" + id +
+                '}';
     }
 }
