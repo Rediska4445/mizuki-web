@@ -23,7 +23,7 @@ export function handleHeader(target)
 
     searchInput.addEventListener('input', (event) =>
     {
-        const query = event.target.value.trim();
+        const query = event.target.value;
 
         clearTimeout(debounceTimeout);
 
@@ -31,7 +31,7 @@ export function handleHeader(target)
         {
             try
             {
-                const tracksContainer = target.querySelector('.tracks-list-container');
+                const tracksContainer = document.querySelector('.tracks-list-container');
                 if (!tracksContainer)
                     return;
 

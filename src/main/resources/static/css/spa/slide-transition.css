@@ -1,0 +1,39 @@
+/* main
+{
+  view-transition-name: main-slide;
+}
+
+::view-transition-old(main-slide)
+{
+  animation: 0.4s ease-in-out both slide-out;
+}
+
+::view-transition-new(main-slide)
+{
+  animation: 0.4s ease-in-out both slide-in;
+}
+
+@keyframes slide-in
+{
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-out
+{
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+*/
+
+.htmx-added
+{
+    opacity: 0;
+}
+
+.htmx-swapping
+{
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
