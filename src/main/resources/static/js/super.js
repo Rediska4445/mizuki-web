@@ -1,6 +1,8 @@
 let isFirstLoad = true;
 window.spaLabelsController = null;
 
+htmx.config.globalViewTransitions = true;
+
 export function getCsrfHeaders()
 {
     const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
@@ -31,6 +33,7 @@ document.addEventListener('htmx:load', (event) =>
         signal: window.spaLabelsController.signal
     });
 
+    // legacy code
     window.myAppInitialized = false;
     window.myAppInitialized2 = false;
 

@@ -1,9 +1,14 @@
 body
 {
+    margin: 0;
+    box-sizing: border-box;
+    padding: 2rem 1rem;
     padding-bottom: 120px;
 }
 
-footer {
+footer
+{
+    all: revert;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -16,7 +21,9 @@ footer {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.player-wrapper-inner {
+.player-wrapper-inner
+{
+    all: revert;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,14 +32,18 @@ footer {
     box-sizing: border-box;
 }
 
-.player-info-block {
+.player-info-block
+{
+    all: revert;
     display: flex;
     align-items: center;
     width: 30%;
     min-width: 200px;
 }
 
-.player-cover-wrap {
+.player-cover-wrap
+{
+    all: revert;
     width: 56px;
     height: 56px;
     border-radius: 4px;
@@ -42,19 +53,25 @@ footer {
     flex-shrink: 0;
 }
 
-.player-cover-wrap img {
+.player-cover-wrap img
+{
+    all: revert;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.player-content {
+.player-content
+{
+    all: revert;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-#now-playing-title {
+#now-playing-title
+{
+    all: revert;
     font-size: 14px;
     font-weight: 500;
     color: #ffffff !important;
@@ -64,7 +81,9 @@ footer {
     margin-bottom: 4px;
 }
 
-#now-playing-author {
+#now-playing-author
+{
+    all: revert;
     font-size: 12px;
     color: #b3b3b3 !important;
     white-space: nowrap;
@@ -72,7 +91,9 @@ footer {
     text-overflow: ellipsis;
 }
 
-.player-controls-block {
+.player-controls-block
+{
+    all: revert;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -83,14 +104,18 @@ footer {
     box-sizing: border-box;
 }
 
-.control-buttons {
+.control-buttons
+{
+    all: revert;
     margin-bottom: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.control-btn {
+.control-btn
+{
+    all: revert;
     background: #ffffff;
     border: none;
     color: #000000;
@@ -104,7 +129,8 @@ footer {
     justify-content: center;
 }
 
-.timeline-container {
+.timeline-container
+{
     display: flex;
     align-items: center;
     width: 100%;
@@ -112,7 +138,8 @@ footer {
     height: 20px;
 }
 
-#player-current-time, #player-duration {
+#player-current-time, #player-duration
+{
     font-size: 11px;
     color: #a7a7a7;
     width: 35px;
@@ -123,7 +150,8 @@ footer {
     flex-shrink: 0;
 }
 
-.player-volume-block {
+.player-volume-block
+{
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -137,14 +165,16 @@ footer {
     box-sizing: border-box;
 }
 
-#player-progress {
+#player-progress
+{
     background: linear-gradient(to right, #ffffff 0%, #4d4d4d 0%);
     border-radius: 2px;
     height: 4px;
     flex-grow: 1;
 }
 
-#player-volume {
+#player-volume
+{
     background: linear-gradient(to right, #ffffff 100%, #4d4d4d 100%);
     border-radius: 2px;
     height: 4px;
@@ -153,14 +183,16 @@ footer {
     flex-shrink: 0;
 }
 
-.volume-icon {
+.volume-icon
+{
     width: 18px;
     height: 18px;
     display: block;
     flex-shrink: 0;
 }
 
-input[type="range"] {
+input[type="range"]
+{
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
@@ -173,17 +205,20 @@ input[type="range"]:focus
     outline: none;
 }
 
-input[type="range"]::-webkit-slider-runnable-track {
+input[type="range"]::-webkit-slider-runnable-track
+{
     background: transparent;
     height: 4px;
 }
 
-input[type="range"]::-moz-range-track {
+input[type="range"]::-moz-range-track
+{
     background: transparent;
     height: 4px;
 }
 
-input[type="range"]::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb
+{
     -webkit-appearance: none;
     appearance: none;
     margin-top: -4px;
@@ -194,7 +229,8 @@ input[type="range"]::-webkit-slider-thumb {
     display: block;
 }
 
-input[type="range"]::-moz-range-thumb {
+input[type="range"]::-moz-range-thumb
+{
     border: none;
     background-color: #ffffff;
     height: 12px;
@@ -203,15 +239,16 @@ input[type="range"]::-moz-range-thumb {
     display: block;
 }
 
-.side-btn {
-    background: transparent !important;
-    color: #b3b3b3 !important;
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 10px !important;
+.side-btn
+{
+    background: transparent;
+    color: #b3b3b3;
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
 }
 
 .side-btn:hover
 {
-    color: #ffffff !important;
+    color: #ffffff;
 }

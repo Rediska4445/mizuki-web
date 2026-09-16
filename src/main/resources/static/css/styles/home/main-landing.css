@@ -1,5 +1,4 @@
-*
-{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -41,13 +40,15 @@ body
     align-items: center;
 }
 
-.hero-section > * {
+.hero-section > *
+{
     align-self: center;
     max-height: 100%;
     box-sizing: border-box;
 }
 
-.hero-content {
+.hero-content
+{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -60,11 +61,13 @@ body
     flex-grow: 0;
 }
 
-.hero-content:hover {
+.hero-content:hover
+{
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.hero-title {
+.hero-title
+{
     font-family: "Roboto", "Arial", sans-serif;
     font-size: 18px;
     font-weight: 600;

@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-    <div th:fragment="tracks-fragment" class="tracks-list-fragment">
-        <link th:href="@{/css/components/buttons/track-item-play-button.css}" rel="stylesheet">
-        <link th:href="@{/css/components/tables/tracks-table.css}" rel="stylesheet">
-        <link th:href="@{/css/components/cells/track-item.css}" rel="stylesheet">
-        <link th:href="@{/css/components/cells/icons/explicit.css}" rel="stylesheet">
+    <div th:fragment="tracks-fragment" class="tracks-list-fragment" hx-ext="head-support">
+        <head>
+            <link th:href="@{/css/components/buttons/track-item-play-button.css}" rel="stylesheet">
+            <link th:href="@{/css/components/tables/tracks-table.css}" rel="stylesheet">
+            <link th:href="@{/css/components/cells/track-item.css}" rel="stylesheet">
+            <link th:href="@{/css/components/cells/icons/explicit.css}" rel="stylesheet">
+        </head>
 
         <script th:src="@{/js/playlist/track.js}" type="module" defer ></script>
         <script th:src="@{/js/scripts/home/fragments/track-list.js}" type="module" defer ></script>
@@ -24,8 +21,8 @@
                          th:data-track-id="${trackForm.track.id}">
                         <div class="track-cover-box">
                             <img th:src="${trackForm.pictureUrl != null && !trackForm.pictureUrl.isEmpty()}
-                                             ? ${trackForm.pictureUrl}
-                                             : @{'/img/logo-hd.png'}"
+                                                 ? ${trackForm.pictureUrl}
+                                                 : @{'/img/logo-hd.png'}"
                                  class="track-cover-img"
                                  alt="Cover">
                             <button class="track-item-player-button"
@@ -83,5 +80,4 @@
             </div>
         </div>
     </div>
-</body>
 </html>
