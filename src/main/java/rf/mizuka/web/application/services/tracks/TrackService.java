@@ -283,7 +283,7 @@ public class TrackService
 
             // Save picture to file storage
             track.setPicturePath(
-                    audioPictureKey = storageService.uploadTrackPicture(meta.rawImage())
+                    audioPictureKey = storageService.uploadImage(cover)
             );
 
             if(track.getColor() == null)
