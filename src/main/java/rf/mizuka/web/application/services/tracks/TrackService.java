@@ -29,7 +29,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -209,9 +208,7 @@ public class TrackService
      *          the byte array of picture to extract picture and after detect color
      * @return color in HEX format
      * **/
-    @org.springframework.transaction.annotation.Transactional(
-            readOnly = true
-    )
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Color getColorFromAlbumArt(byte[] raw)
             throws IOException
     {
@@ -283,7 +280,7 @@ public class TrackService
 
             // Save picture to file storage
             track.setPicturePath(
-                    audioPictureKey = storageService.uploadTrackPicture(meta.rawImage())
+                    audioPictureKey = storageService.uploadImage(cover)
             );
 
             if(track.getColor() == null)

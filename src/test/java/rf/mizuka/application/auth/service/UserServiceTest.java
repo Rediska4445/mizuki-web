@@ -1,6 +1,7 @@
 package rf.mizuka.application.auth.service;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.NamedExecutable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,11 +12,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import rf.mizuka.web.application.controllers.auth.UserExistException;
 import rf.mizuka.web.application.database.entities.user.User;
 import rf.mizuka.web.application.database.repository.user.UserRepository;
 import rf.mizuka.web.application.services.user.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestPropertySource(locations = "classpath:settings-test.properties")
 @Transactional
@@ -59,5 +62,22 @@ public class UserServiceTest
                 .isEqualTo("mock");
         assertThat(user.getPassword())
                 .isEqualTo("123");
+    }
+
+    /*
+     * 1. Exist check in the event problems should throw "UserExistException"
+     * */
+    @Test
+    @DisplayName("T2. Exception existing user in register user should be success")
+    void shouldThrowExceptionRegisterNewUserAndAllowImmediateLogin()
+            throws Exception
+    {
+        // For avoid "(userExist == null || userExist)" condition
+        Mockito.when(userRepository.existsByUsername(Mockito.any()))
+                .thenReturn(true);
+
+        // Catchin exception
+        assertThrows(UserExistException.class, (NamedExecutable) () -> userService
+                .registerUser("mock", "123"));
     }
 }

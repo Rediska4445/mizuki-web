@@ -10,9 +10,10 @@ import rf.mizuka.web.application.clients.storage.StorageClient;
 import rf.mizuka.web.application.services.file.FileService;
 import rf.mizuka.web.application.services.storage.exceptions.PresignedUrlException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -52,7 +53,9 @@ public class StorageService
         }
 
         String extension = fileService.extractExtension(file.getOriginalFilename());
-        String fileKey = UUID.randomUUID() + extension;
+        String fileKey = keyFromString(
+                Objects.requireNonNull(file.getOriginalFilename()) + Objects.requireNonNull(extension)
+        ) + extension;
 
         try
         {
@@ -66,64 +69,22 @@ public class StorageService
         }
     }
 
-    public String getTrackPictureUrl(String coverFileName)
-    {
-        return getFile(coversBucket, coverFileName);
-    }
-
-    // TODO: IMMEDIATILY, SET-UP NORMAL MIGRATIONS TO LOGIC!!!
-    public String uploadTrack(MultipartFile file)
+    public String uploadImage(MultipartFile file)
             throws IOException
     {
-        return uploadFile(tracksBucket, file);
-    }
-
-    public String uploadTrackPicture(byte[] rawImage)
-    {
-        if (rawImage == null || rawImage.length == 0)
+        if (file == null || file.getBytes().length == 0)
         {
             return null;
         }
 
-        String coverKey = UUID.randomUUID() + "-picture.jpg";
+        String extension = file.getContentType() == null ? "image/jpeg" : file.getContentType();
+        String coverKey = keyFromString(
+                Objects.requireNonNull(file.getOriginalFilename())
+        ) + extension;
 
-        storageClient.putObject(coversBucket, coverKey, new ByteArrayInputStream(rawImage), rawImage.length, "image/jpeg");
+        storageClient.putObject(coversBucket, coverKey, file.getInputStream(), file.getSize(), extension);
 
         return coverKey;
-    }
-
-    public String getPresignedUrl(
-            String bucket, String fileName, TimeUnit timeUnit, int duration
-    ) throws PresignedUrlException {
-        try
-        {
-            return storageClient.getPresignedObjectUrl(bucket, fileName, duration, timeUnit);
-        }
-        catch (Exception e)
-        {
-            throw new PresignedUrlException("I could not generate the URL");
-        }
-    }
-
-    public String getTrackPresignedUrl(String trackFileName)
-            throws PresignedUrlException
-    {
-        return getPresignedUrl(tracksBucket, trackFileName, TimeUnit.SECONDS, 5);
-    }
-
-    public String getTrackUrl(String trackFileName)
-    {
-        return getFile(tracksBucket, trackFileName);
-    }
-
-    public void deleteTrack(String trackFileName)
-    {
-        deleteFile(tracksBucket, trackFileName);
-    }
-
-    public void deletePicture(String coverFileName)
-    {
-        deleteFile(coversBucket, coverFileName);
     }
 
     private void deleteFile(String bucketName, String fileName)
@@ -162,5 +123,59 @@ public class StorageService
         {
             throw new RuntimeException("Could not get resource from MinIO: " + filePath, e);
         }
+    }
+
+    // Overloads
+    public String getTrackPictureUrl(String coverFileName)
+    {
+        return getFile(coversBucket, coverFileName);
+    }
+
+    public String uploadTrack(MultipartFile file)
+            throws IOException
+    {
+        return uploadFile(tracksBucket, file);
+    }
+
+    public String getPresignedUrl(
+            String bucket, String fileName, TimeUnit timeUnit, int duration
+    ) throws PresignedUrlException {
+        try
+        {
+            return storageClient.getPresignedObjectUrl(bucket, fileName, duration, timeUnit);
+        }
+        catch (Exception e)
+        {
+            throw new PresignedUrlException("I could not generate the URL");
+        }
+    }
+
+    public String getTrackPresignedUrl(String trackFileName)
+            throws PresignedUrlException
+    {
+        return getPresignedUrl(tracksBucket, trackFileName, TimeUnit.SECONDS, 5);
+    }
+
+    public String getTrackUrl(String trackFileName)
+    {
+        return getFile(tracksBucket, trackFileName);
+    }
+
+    public void deleteTrack(String trackFileName)
+    {
+        deleteFile(tracksBucket, trackFileName);
+    }
+
+    public void deletePicture(String coverFileName)
+    {
+        deleteFile(coversBucket, coverFileName);
+    }
+
+    /* Build pseudo-unique UUID key from string */
+    private String keyFromString(String str)
+    {
+        return Base64.getEncoder().encodeToString(
+                Objects.requireNonNull(str).getBytes(StandardCharsets.UTF_8)
+        );
     }
 }
