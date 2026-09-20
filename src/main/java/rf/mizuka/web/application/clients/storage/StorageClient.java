@@ -6,7 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 public interface StorageClient
 {
-    void putObject(String bucket, String objectName, InputStream stream, long objectSize, String contentType);
+    /**
+     * return objectName in successful
+     * */
+    String putObject(String bucket, String objectName, InputStream stream, long objectSize, String contentType);
     String getPresignedObjectUrl(String bucket, String objectName, int duration, TimeUnit timeUnit);
     void removeObject(String bucket, String objectName);
     long getObjectSize(String bucket, String objectName);

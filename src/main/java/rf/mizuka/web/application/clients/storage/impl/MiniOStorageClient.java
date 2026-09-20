@@ -19,7 +19,7 @@ public final class MiniOStorageClient
     }
 
     @Override
-    public void putObject(String bucket, String objectName, InputStream stream, long objectSize, String contentType)
+    public String putObject(String bucket, String objectName, InputStream stream, long objectSize, String contentType)
     {
         try
         {
@@ -36,6 +36,8 @@ public final class MiniOStorageClient
         {
             throw new RuntimeException("MiniO error: ", e);
         }
+
+        return objectName;
     }
 
     @Override
