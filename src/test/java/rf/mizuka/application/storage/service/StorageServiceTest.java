@@ -109,7 +109,9 @@ public class StorageServiceTest
     {
         byte[] content = "random binary data simulation".getBytes();
 
-        String res = storageService.uploadTrackPicture(content);
+        MockMultipartFile multipartFile = new MockMultipartFile("name", content);
+
+        String res = storageService.uploadImage(multipartFile);
 
         Mockito.verify(storageClient, Mockito.times(1))
                 .putObject(

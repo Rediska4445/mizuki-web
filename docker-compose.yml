@@ -5,17 +5,6 @@
 version: '3.8'
 
 services:
-  mizuki:
-    image: mizuki-web
-    container_name: mizuki-web
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres-db
-      - redis
-      - kafka
-      - minio
-
   # Database
   postgres-db:
     image: postgres:16-alpine
