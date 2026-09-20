@@ -71,14 +71,14 @@ public class Track
     private String description;
 
     @JoinTable(
-            name = "tracks_authors",
-            joinColumns = @JoinColumn(name = "tracks_id"),
-            inverseJoinColumns = @JoinColumn(name = "authors_id")
+        name = "tracks_authors",
+        joinColumns = @JoinColumn(name = "tracks_id"),
+        inverseJoinColumns = @JoinColumn(name = "authors_id")
     )
     @ManyToMany(cascade =
     {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
+        CascadeType.PERSIST,
+        CascadeType.MERGE
     })
     private Set<Author> authors;
 
